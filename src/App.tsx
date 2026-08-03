@@ -12,8 +12,8 @@ type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
   { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://mboapharma.cm/wp-content/uploads/2025/03/alprazolam-biogaran-0-50-mg-comprime-secable.webp', description: 'Description 1' },
-  { id: 2, name: 'ordo', price: 35, image: 'https://via.placeholder.com/150', description: 'Description 2' },
-  { id: 3, name: 'dextrometrophane', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
+  { id: 2, name: 'ordo', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Description 2' },
+  { id: 3, name: 'dextrometrophane', price: 20, image: 'https://cdn.pim.mesoigner.fr/mesoigner/d8a30df0dd02958e70f279d4d06be75a/mesoigner-thumbnail-1000-1000-inset/086/984/100/dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp', description: 'Description 3' }
 ]
 
 function App() {
