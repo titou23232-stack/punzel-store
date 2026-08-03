@@ -11,9 +11,9 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Produit 1', price: 10, image: 'https://via.placeholder.com/150', description: 'Description 1' },
-  { id: 2, name: 'Produit 2', price: 15, image: 'https://via.placeholder.com/150', description: 'Description 2' },
-  { id: 3, name: 'Produit 3', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
+  { id: 1, name: 'Xanax', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente.' },
+  { id: 2, name: 'Ordonnance', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation.' },
+  { id: 3, name: 'Dxtrometrophane', price: 20, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgEk4pnpfjIUxFjbc1kYViNFO4ngSgGhNmKcp1vgjLRQ&s=10', description: 'Le dextrométhorphane peut provoquer des sensations de vertige ou de tête qui tourne.' }
 ]
 
 function App() {
