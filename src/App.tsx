@@ -13,23 +13,23 @@ type CartItem = Product & { quantity: number }
 const PRODUCTS: Product[] = [
   {
     id: 1,
-    name: 'xanax 0,50mg',
-    price: 15.00,
-    image: 'https://www.google.com/imgres?q=alprazolam&imgurl=https%3A%2F%2Fmboapharma.cm%2Fwp-content%2Fuploads%2F2025%2F03%2Falprazolam-biogaran-0-50-mg-comprime-secable.webp&imgrefurl=https%3A%2F%2Fmboapharma.cm%2Fproduit%2Falprazolam-biogaran-050-mg%2F&docid=9s5gfhRDgPwDDM&tbnid=5vAVFXVSOqq9HM&vet=12ahUKEwjHpqfpk4WWAxWMVKQEHTSgOlYQnPAOegUIiQEQAA..i&w=300&h=300&hcb=2&ved=2ahUKEwjHpqfpk4WWAxWMVKQEHTSgOlYQnPAOegUIiQEQAA',
+    name: 'Produit 1',
+    price: 10.00,
+    image: 'https://via.placeholder.com/150',
     description: 'Description du produit 1'
   },
   {
     id: 2,
-    name: 'ordonnance',
-    price: 35.00,
-    image: 'https://www.google.com/imgres?q=ordonnance&imgurl=https%3A%2F%2Fstatic.allodocteurs.fr%2Fv1%2F31157-default-720%2Fb48bfa025a4c2f0951ceb2481b8f0e1b%2Fmedia&imgrefurl=https%3A%2F%2Fwww.allodocteurs.fr%2Fse-soigner-ordonnances-on-vous-dit-tout-sur-leur-mode-demploi-28671.html&docid=WcToedflJwtAUM&tbnid=w-MgFlKCfwzPeM&vet=12ahUKEwjUuq2IlIWWAxU_U6QEHU0NFGkQnPAOegQINRAA..i&w=720&h=405&hcb=2&ved=2ahUKEwjUuq2IlIWWAxU_U6QEHU0NFGkQnPAOegQINRAA',
+    name: 'Produit 2',
+    price: 15.00,
+    image: 'https://via.placeholder.com/150',
     description: 'Description du produit 2'
   },
   {
     id: 3,
-    name: 'dextrometrophane',
+    name: 'Produit 3',
     price: 20.00,
-    image: 'https://www.google.com/imgres?q=dextrometrophane&imgurl=https%3A%2F%2Fcdn.pim.mesoigner.fr%2Fmesoigner%2Fd8a30df0dd02958e70f279d4d06be75a%2Fmesoigner-thumbnail-1000-1000-inset%2F086%2F984%2F100%2Fdextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp&imgrefurl=https%3A%2F%2Fpharmacie-gascogne-seysses.mesoigner.fr%2Fmedicament-produit-parapharmacie%2F346663-dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique&docid=hDCQ1pKpjkMJDM&tbnid=n-HjYwhJwPy1NM&vet=12ahUKEwjtz9mklIWWAxUTe6QEHT3PNs0QnPAOegQIPhAA..i&w=1000&h=1000&hcb=2&ved=2ahUKEwjtz9mklIWWAxUTe6QEHT3PNs0QnPAOegQIPhAA',
+    image: 'https://via.placeholder.com/150',
     description: 'Description du produit 3'
   }
 ]
@@ -178,4 +178,54 @@ function App() {
                 >
                   <div>
                     <strong>{item.name}</strong>
-                    <div style={{ fontSize: 13, opacity
+                    <div style={{ fontSize: 13, opacity: 0.7 }}>
+                      {item.price.toFixed(2)} € × {item.quantity}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={btnStyle}>-</button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={btnStyle}>+</button>
+                  </div>
+                </div>
+              ))}
+
+              <div style={{ marginTop: 20, fontSize: 18, fontWeight: 'bold' }}>
+                Total : {total.toFixed(2)} €
+              </div>
+
+              <button
+                onClick={placeOrder}
+                style={{
+                  marginTop: 16,
+                  width: '100%',
+                  background: '#0088cc',
+                  color: 'white',
+                  border: 'none',
+                  padding: 14,
+                  borderRadius: 10,
+                  fontSize: 16,
+                  fontWeight: 'bold'
+                }}
+              >
+                Valider la commande
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const btnStyle: React.CSSProperties = {
+  background: '#333',
+  color: 'white',
+  border: 'none',
+  width: 28,
+  height: 28,
+  borderRadius: 6,
+  fontSize: 16
+}
+
+export default App
