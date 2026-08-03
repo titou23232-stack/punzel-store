@@ -11,27 +11,9 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: 'Produit 1',
-    price: 10.00,
-    image: 'https://via.placeholder.com/150',
-    description: 'Description du produit 1'
-  },
-  {
-    id: 2,
-    name: 'Produit 2',
-    price: 15.00,
-    image: 'https://via.placeholder.com/150',
-    description: 'Description du produit 2'
-  },
-  {
-    id: 3,
-    name: 'Produit 3',
-    price: 20.00,
-    image: 'https://via.placeholder.com/150',
-    description: 'Description du produit 3'
-  }
+  { id: 1, name: 'Produit 1', price: 10, image: 'https://via.placeholder.com/150', description: 'Description 1' },
+  { id: 2, name: 'Produit 2', price: 15, image: 'https://via.placeholder.com/150', description: 'Description 2' },
+  { id: 3, name: 'Produit 3', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
 ]
 
 function App() {
@@ -44,170 +26,75 @@ function App() {
     if (tg) {
       tg.ready()
       tg.expand()
-      if (tg.initDataUnsafe?.user) {
-        setUser(tg.initDataUnsafe.user)
-      }
+      if (tg.initDataUnsafe?.user) setUser(tg.initDataUnsafe.user)
     }
   }, [])
 
   const addToCart = (product: Product) => {
     setCart(prev => {
-      const existing = prev.find(item => item.id === product.id)
+      const existing = prev.find(i => i.id === product.id)
       if (existing) {
-        return prev.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
+        return prev.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
       }
       return [...prev, { ...product, quantity: 1 }]
     })
   }
 
-  const removeFromCart = (id: number) => {
-    setCart(prev => prev.filter(item => item.id !== id))
-  }
-
   const updateQuantity = (id: number, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(id)
+      setCart(prev => prev.filter(i => i.id !== id))
       return
     }
-    setCart(prev =>
-      prev.map(item => (item.id === id ? { ...item, quantity } : item))
-    )
+    setCart(prev => prev.map(i => i.id === id ? { ...i, quantity } : i))
   }
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
-
-  const placeOrder = () => {
-    if (cart.length === 0) return
-    alert(`Commande envoyée !\nTotal : ${total.toFixed(2)} €\nArticles : ${cartCount}`)
-    setCart([])
-    setPage('catalog')
-  }
+  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const cartCount = cart.reduce((sum, i) => sum + i.quantity, 0)
 
   return (
     <div style={{ padding: 16, fontFamily: 'sans-serif', background: '#111', color: 'white', minHeight: '100vh' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h1 style={{ margin: 0, fontSize: 22 }}>Punzel Store</h1>
-        <button
-          onClick={() => setPage(page === 'catalog' ? 'cart' : 'catalog')}
-          style={{
-            background: '#0088cc',
-            color: 'white',
-            border: 'none',
-            padding: '8px 14px',
-            borderRadius: 8,
-            fontWeight: 'bold'
-          }}
-        >
+        <h1 style={{ margin: 0 }}>Punzel Store</h1>
+        <button onClick={() => setPage(page === 'catalog' ? 'cart' : 'catalog')} style={{ background: '#0088cc', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8 }}>
           {page === 'catalog' ? `Panier (${cartCount})` : 'Catalogue'}
         </button>
       </div>
 
-      {user && (
-        <p style={{ marginBottom: 16, opacity: 0.8 }}>
-          Bonjour <strong>{user.first_name}</strong>
-        </p>
-      )}
+      {user && <p>Bonjour <strong>{user.first_name}</strong></p>}
 
-      {page === 'catalog' && (
-        <div>
-          {PRODUCTS.map(product => (
-            <div
-              key={product.id}
-              style={{
-                background: '#1e1e1e',
-                borderRadius: 12,
-                padding: 12,
-                marginBottom: 12,
-                display: 'flex',
-                gap: 12
-              }}
-            >
-              <img
-                src={product.image}
-                alt={product.name}
-                style={{ width: 80, height: 80, borderRadius: 8, objectFit: 'cover' }}
-              />
-              <div style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 4px 0' }}>{product.name}</h3>
-                <p style={{ margin: '0 0 6px 0', fontSize: 13, opacity: 0.7 }}>{product.description}</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong>{product.price.toFixed(2)} €</strong>
-                  <button
-                    onClick={() => addToCart(product)}
-                    style={{
-                      background: '#22c55e',
-                      color: 'white',
-                      border: 'none',
-                      padding: '6px 12px',
-                      borderRadius: 6,
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    Ajouter
-                  </button>
-                </div>
-              </div>
+      {page === 'catalog' && PRODUCTS.map(p => (
+        <div key={p.id} style={{ background: '#1e1e1e', borderRadius: 12, padding: 12, marginBottom: 12, display: 'flex', gap: 12 }}>
+          <img src={p.image} style={{ width: 80, height: 80, borderRadius: 8 }} />
+          <div style={{ flex: 1 }}>
+            <h3 style={{ margin: 0 }}>{p.name}</h3>
+            <p style={{ fontSize: 13, opacity: 0.7 }}>{p.description}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong>{p.price} €</strong>
+              <button onClick={() => addToCart(p)} style={{ background: '#22c55e', color: 'white', border: 'none', padding: '6px 12px', borderRadius: 6 }}>Ajouter</button>
             </div>
-          ))}
+          </div>
         </div>
-      )}
+      ))}
 
       {page === 'cart' && (
         <div>
-          {cart.length === 0 ? (
-            <p>Ton panier est vide.</p>
-          ) : (
+          {cart.length === 0 ? <p>Panier vide</p> : (
             <>
               {cart.map(item => (
-                <div
-                  key={item.id}
-                  style={{
-                    background: '#1e1e1e',
-                    borderRadius: 12,
-                    padding: 12,
-                    marginBottom: 10,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
-                >
+                <div key={item.id} style={{ background: '#1e1e1e', padding: 12, marginBottom: 10, borderRadius: 12, display: 'flex', justifyContent: 'space-between' }}>
                   <div>
                     <strong>{item.name}</strong>
-                    <div style={{ fontSize: 13, opacity: 0.7 }}>
-                      {item.price.toFixed(2)} € × {item.quantity}
-                    </div>
+                    <div>{item.price} € × {item.quantity}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={btnStyle}>-</button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={btnStyle}>+</button>
+                  <div>
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
+                    <span style={{ margin: '0 8px' }}>{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
                   </div>
                 </div>
               ))}
-
-              <div style={{ marginTop: 20, fontSize: 18, fontWeight: 'bold' }}>
-                Total : {total.toFixed(2)} €
-              </div>
-
-              <button
-                onClick={placeOrder}
-                style={{
-                  marginTop: 16,
-                  width: '100%',
-                  background: '#0088cc',
-                  color: 'white',
-                  border: 'none',
-                  padding: 14,
-                  borderRadius: 10,
-                  fontSize: 16,
-                  fontWeight: 'bold'
-                }}
-              >
+              <h3>Total : {total.toFixed(2)} €</h3>
+              <button onClick={() => { alert('Commande envoyée !'); setCart([]); setPage('catalog') }} style={{ width: '100%', background: '#0088cc', color: 'white', border: 'none', padding: 14, borderRadius: 10, marginTop: 12 }}>
                 Valider la commande
               </button>
             </>
@@ -216,16 +103,6 @@ function App() {
       )}
     </div>
   )
-}
-
-const btnStyle: React.CSSProperties = {
-  background: '#333',
-  color: 'white',
-  border: 'none',
-  width: 28,
-  height: 28,
-  borderRadius: 6,
-  fontSize: 16
 }
 
 export default App
