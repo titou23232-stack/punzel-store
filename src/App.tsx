@@ -11,9 +11,9 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Produit 1', price: 10, image: 'https://via.placeholder.com/150', description: 'Description 1' },
-  { id: 2, name: 'Produit 2', price: 15, image: 'https://via.placeholder.com/150', description: 'Description 2' },
-  { id: 3, name: 'Produit 3', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
+  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://via.placeholder.com/150', description: 'Description 1' },
+  { id: 2, name: 'ordo', price: 35, image: 'https://via.placeholder.com/150', description: 'Description 2' },
+  { id: 3, name: 'dextrometrophane', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
 ]
 
 function App() {
