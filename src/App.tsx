@@ -11,9 +11,9 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Xanax', price: 15, image: 'https://via.placeholder.com/150', description: 'Description 1' },
-  { id: 2, name: 'Ordonnance', price: 35, image: 'https://via.placeholder.com/150', description: 'Description 2' },
-  { id: 3, name: 'Dextrometrophane', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
+  { id: 1, name: 'Xanax', price: 15, image: 'https://via.placeholder.com/150', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente.' },
+  { id: 2, name: 'Ordonnance', price: 35, image: 'https://via.placeholder.com/150', description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation.' },
+  { id: 3, name: 'Dextrometrophane', price: 20, image: 'https://via.placeholder.com/150', description: 'Le dextrométhorphane peut provoquer des sensations de vertige ou de tête qui tourne.' }
 ]
 
 function App() {
