@@ -20,9 +20,9 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://via.placeholder.com/150', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente.' },
-  { id: 2, name: 'Ordonnance', price: 35, image: 'https://via.placeholder.com/150', description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation.' },
-  { id: 3, name: 'Dextrometrophane', price: 20, image: 'https://via.placeholder.com/150', description: 'Le dextrométhorphane peut provoquer des sensations de vertige ou de tête qui tourne.' }
+  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente.' },
+  { id: 2, name: 'Ordonnance', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation.' },
+  { id: 3, name: 'Dextrometrophane', price: 20, image: 'https://cdn.pim.mesoigner.fr/mesoigner/d8a30df0dd02958e70f279d4d06be75a/mesoigner-thumbnail-1000-1000-inset/086/984/100/dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp', description: 'Le dextrométhorphane peut provoquer des sensations de vertige ou de tête qui tourne.' }
 ]
 
 function App() {
