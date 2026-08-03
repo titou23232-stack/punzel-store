@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react'
-import { init, retrieveLaunchParams, miniApp } from '@tma.js/sdk'
+
+declare global {
+  interface Window {
+    Telegram: any
+  }
+}
 
 function App() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    try {
-      init()
-      miniApp.ready()
-      miniApp.expand()
-
-      const { initData } = retrieveLaunchParams()
-      if (initData?.user) {
-        setUser(initData.user)
+    const tg = window.Telegram?.WebApp
+    if (tg) {
+      tg.ready()
+      tg.expand()
+      if (tg.initDataUnsafe?.user) {
+        setUser(tg.initDataUnsafe.user)
       }
-    } catch (e) {
-      console.log('Pas dans Telegram')
     }
   }, [])
 
