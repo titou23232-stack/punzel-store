@@ -11,7 +11,7 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://mboapharma.cm/produit/alprazolam-biogaran-050-mg/', description: 'Description 1' },
+  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://mboapharma.cm/wp-content/uploads/2025/03/alprazolam-biogaran-0-50-mg-comprime-secable.webp', description: 'Description 1' },
   { id: 2, name: 'ordo', price: 35, image: 'https://via.placeholder.com/150', description: 'Description 2' },
   { id: 3, name: 'dextrometrophane', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
 ]
