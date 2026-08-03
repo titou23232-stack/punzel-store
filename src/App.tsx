@@ -11,14 +11,9 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://mboapharma.cm/wp-content/uploads/2025/03/alprazolam-biogaran-0-50-mg-comprime-secable.webp', description: 'Xanax (alprazolam) est un médicament qui sert à calmer l anxiété et les crises d'angoisse. Il agit rapidement en ralentissant l activité du cerveau, ce qui aide à se sentir plus détendu.' },
-  { id: 2, name: 'ordo', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale est un document rédigé par un professionnel de santé qui indique les médicaments ou traitements à prendre, ainsi que leur dose, leur durée et les consignes d'utilisation.' },
-  { id: 3, name: 'dextrometrophane', price: 20, image: 'https://cdn.pim.mesoigner.fr/mesoigner/d8a30df0dd02958e70f279d4d06be75a/mesoigner-thumbnail-1000-1000-inset/086/984/100/dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp', description: 'Les effets du dextrométhorphane peuvent inclure :
-
-🌬️ Diminue la toux sèche.
-😴 Peut provoquer de la somnolence.
-🤢 Peut causer des étourdissements.
-😵 Peut parfois entraîner une légère baisse de la vigilance.' }
+  { id: 1, name: 'Produit 1', price: 10, image: 'https://via.placeholder.com/150', description: 'Description 1' },
+  { id: 2, name: 'Produit 2', price: 15, image: 'https://via.placeholder.com/150', description: 'Description 2' },
+  { id: 3, name: 'Produit 3', price: 20, image: 'https://via.placeholder.com/150', description: 'Description 3' }
 ]
 
 function App() {
