@@ -7,7 +7,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 const ADMIN_IDS = [5553381196, 6044402765]
 const VINTED_URL = 'https://www.vinted.fr/member/3164609498-punslestore5'
-const PAYPAL_URL = 'const PAYPAL_URL = 'https://paypal.me/PunzelStore'
+const PAYPAL_URL = 'https://paypal.me/PunzelStore'
 
 type Product = {
   id: number
