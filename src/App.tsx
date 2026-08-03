@@ -127,25 +127,25 @@ function App() {
     }
 
     // Notification aux admins
-    try {
-      await fetch(`${SUPABASE_URL}/functions/v1/notify-admins`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify({
-          order: {
-            first_name: user.first_name,
-            username: user.username,
-            total: total,
-            products: { items: cart, form: form }
-          }
-        })
-      })
-    } catch (e) {
-      console.error('Erreur notification', e)
-    }
+try {
+  await fetch('https://uajxxenodzturmmwevvq.supabase.co/functions/v1/notify-admins', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer sb_publishable_mBx6LDqh0GHUoQG9FCxFqg_BDXPVf7H'
+    },
+    body: JSON.stringify({
+      order: {
+        first_name: user.first_name,
+        username: user.username,
+        total: total,
+        products: { items: cart, form: form }
+      }
+    })
+  })
+} catch (e) {
+  console.error(e)
+}
 
     const gainedXp = Math.floor(total)
     const newXp = xp + gainedXp
