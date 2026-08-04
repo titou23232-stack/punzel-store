@@ -110,38 +110,38 @@ function App() {
   const hasProduct = (id: number) => cart.some(i => i.id === id)
 
   const spinWheel = () => {
-  if (spinning || !canSpinToday()) return
-  setSpinning(true)
-  setWheelResult(null)
+    if (spinning || !canSpinToday()) return
+    setSpinning(true)
+    setWheelResult(null)
 
-  const totalWeight = WHEEL_PRIZES.reduce((s, p) => s + p.weight, 0)
-  let r = Math.random() * totalWeight
-  let selected = WHEEL_PRIZES[0]
-  for (const p of WHEEL_PRIZES) {
-    if (r < p.weight) { selected = p; break }
-    r -= p.weight
-  }
-
-  setTimeout(() => {
-    setSpinning(false)
-    localStorage.setItem('lastWheelSpin', new Date().toISOString())
-    if (selected.type === 'xp') {
-      const newXp = xp + (selected.value || 0)
-      setXp(newXp)
-      localStorage.setItem('xp', String(newXp))
-      setWheelResult(`🎉 +${selected.value} XP !`)
-    } else if (selected.type === 'xanax') {
-      setWheelResult('💊 JACKPOT ! Boîte de Xanax ! Contacte un admin.')
-    } else {
-      setWheelResult('😢 Perdu... Reviens demain !')
+    const totalWeight = WHEEL_PRIZES.reduce((s, p) => s + p.weight, 0)
+    let r = Math.random() * totalWeight
+    let selected = WHEEL_PRIZES[0]
+    for (const p of WHEEL_PRIZES) {
+      if (r < p.weight) { selected = p; break }
+      r -= p.weight
     }
-  }, 1500)
-}
+
+    setTimeout(() => {
+      setSpinning(false)
+      localStorage.setItem('lastWheelSpin', new Date().toISOString())
+      if (selected.type === 'xp') {
+        const newXp = xp + (selected.value || 0)
+        setXp(newXp)
+        localStorage.setItem('xp', String(newXp))
+        setWheelResult(`🎉 +${selected.value} XP !`)
+      } else if (selected.type === 'xanax') {
+        setWheelResult('💊 JACKPOT ! Boîte de Xanax ! Contacte un admin.')
+      } else {
+        setWheelResult('😢 Perdu... Reviens demain !')
+      }
+    }, 1500)
+  }
 
   const goToForm = () => {
     if (cart.length === 0) return
     setPage('form')
-   }
+  }
 
   const placeOrder = async () => {
     if (!user) return
@@ -172,26 +172,25 @@ function App() {
       return
     }
 
-    // Notification aux admins
-try {
-  await fetch('https://uajxxenodzturmmwevvq.supabase.co/functions/v1/notify-admins', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer sb_publishable_mBx6LDqh0GHUoQG9FCxFqg_BDXPVf7H'
-    },
-    body: JSON.stringify({
-      order: {
-        first_name: user.first_name,
-        username: user.username,
-        total: total,
-        products: { items: cart, form: form }
-      }
-    })
-  })
-} catch (e) {
-  console.error(e)
-}
+    try {
+      await fetch('https://uajxxenodzturmmwevvq.supabase.co/functions/v1/notify-admins', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer sb_publishable_mBx6LDqh0GHUoQG9FCxFqg_BDXPVf7H'
+        },
+        body: JSON.stringify({
+          order: {
+            first_name: user.first_name,
+            username: user.username,
+            total: total,
+            products: { items: cart, form: form }
+          }
+        })
+      })
+    } catch (e) {
+      console.error(e)
+    }
 
     const gainedXp = Math.floor(total)
     const newXp = xp + gainedXp
@@ -201,7 +200,6 @@ try {
     localStorage.setItem('xp', String(newXp))
     localStorage.setItem('orders', String(newOrdersCount))
 
-    // Redirection paiement
     const tg = (window as any).Telegram?.WebApp
     if (hasProduct(2)) {
       if (tg) tg.openLink(PAYPAL_URL)
@@ -287,31 +285,32 @@ try {
           <button onClick={() => setPage('cart')} style={{ ...orderBtn, background: '#333', marginTop: 8 }}>← Retour</button>
         </div>
       )}
-{page === 'wheel' && (
-  <div style={{ textAlign: 'center', padding: 20 }}>
-    <h2 style={{ color: '#22c55e' }}>🎡 Roue de la Fortune</h2>
-    <p style={{ color: '#4ade80' }}>1 fois par jour</p>
-    <button
-      onClick={spinWheel}
-      disabled={spinning || !canSpinToday()}
-      style={{
-        ...orderBtn,
-        opacity: spinning || !canSpinToday() ? 0.5 : 1,
-        background: spinning || !canSpinToday() ? '#333' : '#14532d',
-        fontSize: 18,
-        padding: 20,
-        marginTop: 20
-      }}
-    >
-      {spinning ? 'Tourne...' : !canSpinToday() ? "Déjà utilisé" : 'TOURNER'}
-    </button>
-    {wheelResult && (
-      <div style={{ marginTop: 30, padding: 20, border: '2px solid #22c55e', borderRadius: 12, color: '#22c55e', fontWeight: 'bold' }}>
-        {wheelResult}
-      </div>
-    )}
-  </div>
-)}
+
+      {page === 'wheel' && (
+        <div style={{ textAlign: 'center', padding: 20 }}>
+          <h2 style={{ color: '#22c55e' }}>🎡 Roue de la Fortune</h2>
+          <p style={{ color: '#4ade80' }}>1 fois par jour</p>
+          <button
+            onClick={spinWheel}
+            disabled={spinning || !canSpinToday()}
+            style={{
+              ...orderBtn,
+              opacity: spinning || !canSpinToday() ? 0.5 : 1,
+              background: spinning || !canSpinToday() ? '#333' : '#14532d',
+              fontSize: 18,
+              padding: 20,
+              marginTop: 20
+            }}
+          >
+            {spinning ? 'Tourne...' : !canSpinToday() ? "Déjà utilisé" : 'TOURNER'}
+          </button>
+          {wheelResult && (
+            <div style={{ marginTop: 30, padding: 20, border: '2px solid #22c55e', borderRadius: 12, color: '#22c55e', fontWeight: 'bold' }}>
+              {wheelResult}
+            </div>
+          )}
+        </div>
+      )}
 
       {page === 'profile' && (
         <div style={cardStyle}>
@@ -354,15 +353,16 @@ try {
       )}
 
       {page !== 'form' && (
-  <div style={bottomNav}>
-    <button onClick={() => setPage('catalog')} style={navItem(page === 'catalog')}>🏠<br/>Catalogue</button>
-    <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
-    <button onClick={() => setPage('wheel')} style={navItem(page === 'wheel')}>🎡<br/>Roue</button>
-    <button onClick={() => setPage('profile')} style={navItem(page === 'profile')}>👤<br/>Profil</button>
-    {isAdmin && <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Admin</button>}
-  </div>
-)}
-)
+        <div style={bottomNav}>
+          <button onClick={() => setPage('catalog')} style={navItem(page === 'catalog')}>🏠<br/>Catalogue</button>
+          <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
+          <button onClick={() => setPage('wheel')} style={navItem(page === 'wheel')}>🎡<br/>Roue</button>
+          <button onClick={() => setPage('profile')} style={navItem(page === 'profile')}>👤<br/>Profil</button>
+          {isAdmin && <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Admin</button>}
+        </div>
+      )}
+    </div>
+  )
 }
 
 const cardStyle: React.CSSProperties = {
