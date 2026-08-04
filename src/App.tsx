@@ -19,6 +19,21 @@ type Product = {
 
 type CartItem = Product & { quantity: number }
 
+const WHEEL_PRIZES = [
+  { type: 'lose', weight: 50 },
+  { type: 'xp', value: 10, weight: 20 },
+  { type: 'xp', value: 20, weight: 15 },
+  { type: 'xp', value: 30, weight: 8 },
+  { type: 'xp', value: 50, weight: 5 },
+  { type: 'xanax', weight: 2 },
+]
+
+const canSpinToday = () => {
+  const last = localStorage.getItem('lastWheelSpin')
+  if (!last) return true
+  return new Date(last).toDateString() !== new Date().toDateString()
+}
+
 const PRODUCTS: Product[] = [
   { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente.' },
   { id: 2, name: 'Ordonnance', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation.' },
@@ -29,7 +44,9 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [cart, setCart] = useState<CartItem[]>([])
-  const [page, setPage] = useState<'catalog' | 'cart' | 'profile' | 'admin' | 'form'>('catalog')
+  const [page, setPage] = useState<'catalog' | 'cart' | 'profile' | 'admin' | 'form' | 'wheel'>('catalog')
+  const [spinning, setSpinning] = useState(false)
+  const [wheelResult, setWheelResult] = useState<string | null>(null)
   const [xp, setXp] = useState(0)
   const [orders, setOrders] = useState(0)
   const [adminOrders, setAdminOrders] = useState<any[]>([])
@@ -92,10 +109,39 @@ function App() {
   const isAdmin = ADMIN_IDS.includes(user?.id)
   const hasProduct = (id: number) => cart.some(i => i.id === id)
 
+  const spinWheel = () => {
+  if (spinning || !canSpinToday()) return
+  setSpinning(true)
+  setWheelResult(null)
+
+  const totalWeight = WHEEL_PRIZES.reduce((s, p) => s + p.weight, 0)
+  let r = Math.random() * totalWeight
+  let selected = WHEEL_PRIZES[0]
+  for (const p of WHEEL_PRIZES) {
+    if (r < p.weight) { selected = p; break }
+    r -= p.weight
+  }
+
+  setTimeout(() => {
+    setSpinning(false)
+    localStorage.setItem('lastWheelSpin', new Date().toISOString())
+    if (selected.type === 'xp') {
+      const newXp = xp + (selected.value || 0)
+      setXp(newXp)
+      localStorage.setItem('xp', String(newXp))
+      setWheelResult(`🎉 +${selected.value} XP !`)
+    } else if (selected.type === 'xanax') {
+      setWheelResult('💊 JACKPOT ! Boîte de Xanax ! Contacte un admin.')
+    } else {
+      setWheelResult('😢 Perdu... Reviens demain !')
+    }
+  }, 1500)
+}
+
   const goToForm = () => {
     if (cart.length === 0) return
     setPage('form')
-  }
+   }
 
   const placeOrder = async () => {
     if (!user) return
@@ -241,6 +287,31 @@ try {
           <button onClick={() => setPage('cart')} style={{ ...orderBtn, background: '#333', marginTop: 8 }}>← Retour</button>
         </div>
       )}
+{page === 'wheel' && (
+  <div style={{ textAlign: 'center', padding: 20 }}>
+    <h2 style={{ color: '#22c55e' }}>🎡 Roue de la Fortune</h2>
+    <p style={{ color: '#4ade80' }}>1 fois par jour</p>
+    <button
+      onClick={spinWheel}
+      disabled={spinning || !canSpinToday()}
+      style={{
+        ...orderBtn,
+        opacity: spinning || !canSpinToday() ? 0.5 : 1,
+        background: spinning || !canSpinToday() ? '#333' : '#14532d',
+        fontSize: 18,
+        padding: 20,
+        marginTop: 20
+      }}
+    >
+      {spinning ? 'Tourne...' : !canSpinToday() ? "Déjà utilisé" : 'TOURNER'}
+    </button>
+    {wheelResult && (
+      <div style={{ marginTop: 30, padding: 20, border: '2px solid #22c55e', borderRadius: 12, color: '#22c55e', fontWeight: 'bold' }}>
+        {wheelResult}
+      </div>
+    )}
+  </div>
+)}
 
       {page === 'profile' && (
         <div style={cardStyle}>
@@ -283,15 +354,15 @@ try {
       )}
 
       {page !== 'form' && (
-        <div style={bottomNav}>
-          <button onClick={() => setPage('catalog')} style={navItem(page === 'catalog')}>🏠<br/>Catalogue</button>
-          <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
-          <button onClick={() => setPage('profile')} style={navItem(page === 'profile')}>👤<br/>Profil</button>
-          {isAdmin && <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Admin</button>}
-        </div>
-      )}
-    </div>
-  )
+  <div style={bottomNav}>
+    <button onClick={() => setPage('catalog')} style={navItem(page === 'catalog')}>🏠<br/>Catalogue</button>
+    <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
+    <button onClick={() => setPage('wheel')} style={navItem(page === 'wheel')}>🎡<br/>Roue</button>
+    <button onClick={() => setPage('profile')} style={navItem(page === 'profile')}>👤<br/>Profil</button>
+    {isAdmin && <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Admin</button>}
+  </div>
+)}
+)
 }
 
 const cardStyle: React.CSSProperties = {
