@@ -20,12 +20,14 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const WHEEL_PRIZES = [
-  { type: 'lose', weight: 50 },
-  { type: 'xp', value: 10, weight: 20 },
-  { type: 'xp', value: 20, weight: 15 },
-  { type: 'xp', value: 30, weight: 8 },
-  { type: 'xp', value: 50, weight: 5 },
-  { type: 'xanax', weight: 2 },
+  { label: 'PERDU', type: 'lose', weight: 45, color: '#333' },
+  { label: '+10 XP', type: 'xp', value: 10, weight: 20, color: '#14532d' },
+  { label: '+20 XP', type: 'xp', value: 20, weight: 15, color: '#166534' },
+  { label: '+30 XP', type: 'xp', value: 30, weight: 10, color: '#15803d' },
+  { label: '+50 XP', type: 'xp', value: 50, weight: 7, color: '#22c55e' },
+  { label: 'PERDU', type: 'lose', weight: 15, color: '#222' },
+  { label: 'Boîte Xanax', type: 'xanax', weight: 2, color: '#fbbf24' },
+  { label: 'PERDU', type: 'lose', weight: 10, color: '#111' },
 ]
 
 const canSpinToday = () => {
@@ -35,9 +37,9 @@ const canSpinToday = () => {
 }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente.' },
-  { id: 2, name: 'Ordonnance', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation.' },
-  { id: 3, name: 'Dextrometrophane', price: 20, image: 'https://cdn.pim.mesoigner.fr/mesoigner/d8a30df0dd02958e70f279d4d06be75a/mesoigner-thumbnail-1000-1000-inset/086/984/100/dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp', description: 'Le dextrométhorphane peut provoquer des sensations de vertige ou de tête qui tourne.' }
+  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété.' },
+  { id: 2, name: 'Ordonnance', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale.' },
+  { id: 3, name: 'Dextrometrophane', price: 20, image: 'https://cdn.pim.mesoigner.fr/mesoigner/d8a30df0dd02958e70f279d4d06be75a/mesoigner-thumbnail-1000-1000-inset/086/984/100/dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp', description: 'Le dextrométhorphane.' }
 ]
 
 function App() {
@@ -47,6 +49,7 @@ function App() {
   const [page, setPage] = useState<'catalog' | 'cart' | 'profile' | 'admin' | 'form' | 'wheel'>('catalog')
   const [spinning, setSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<string | null>(null)
+  const [rotation, setRotation] = useState(0)
   const [xp, setXp] = useState(0)
   const [orders, setOrders] = useState(0)
   const [adminOrders, setAdminOrders] = useState<any[]>([])
@@ -117,10 +120,20 @@ function App() {
     const totalWeight = WHEEL_PRIZES.reduce((s, p) => s + p.weight, 0)
     let r = Math.random() * totalWeight
     let selected = WHEEL_PRIZES[0]
-    for (const p of WHEEL_PRIZES) {
-      if (r < p.weight) { selected = p; break }
-      r -= p.weight
+    let selectedIndex = 0
+
+    for (let i = 0; i < WHEEL_PRIZES.length; i++) {
+      if (r < WHEEL_PRIZES[i].weight) {
+        selected = WHEEL_PRIZES[i]
+        selectedIndex = i
+        break
+      }
+      r -= WHEEL_PRIZES[i].weight
     }
+
+    const segment = 360 / WHEEL_PRIZES.length
+    const finalRotation = 1800 + (360 - (selectedIndex * segment + segment / 2))
+    setRotation(finalRotation)
 
     setTimeout(() => {
       setSpinning(false)
@@ -129,13 +142,13 @@ function App() {
         const newXp = xp + (selected.value || 0)
         setXp(newXp)
         localStorage.setItem('xp', String(newXp))
-        setWheelResult(`🎉 +${selected.value} XP !`)
+        setWheelResult(`🎉 Tu as gagné +${selected.value} XP !`)
       } else if (selected.type === 'xanax') {
         setWheelResult('💊 JACKPOT ! Boîte de Xanax ! Contacte un admin.')
       } else {
         setWheelResult('😢 Perdu... Reviens demain !')
       }
-    }, 1500)
+    }, 4000)
   }
 
   const goToForm = () => {
@@ -145,7 +158,6 @@ function App() {
 
   const placeOrder = async () => {
     if (!user) return
-
     if (!form.fullName || !form.address || !form.phone) {
       alert('Merci de remplir Nom, Adresse et Téléphone')
       return
@@ -165,10 +177,8 @@ function App() {
     }
 
     const { error } = await supabase.from('orders').insert(orderData)
-
     if (error) {
       alert('Erreur lors de la commande')
-      console.error(error)
       return
     }
 
@@ -188,9 +198,7 @@ function App() {
           }
         })
       })
-    } catch (e) {
-      console.error(e)
-    }
+    } catch (e) {}
 
     const gainedXp = Math.floor(total)
     const newXp = xp + gainedXp
@@ -209,7 +217,7 @@ function App() {
       else window.open(VINTED_URL, '_blank')
     }
 
-    alert(`Commande enregistrée !\n+${gainedXp} XP\nTu vas être redirigé pour le paiement.`)
+    alert(`Commande enregistrée !\n+${gainedXp} XP`)
     setCart([])
     setForm({ quantity: '', fullName: '', address: '', phone: '', whatClientWants: '', birthDate: '' })
     setPage('catalog')
@@ -287,9 +295,62 @@ function App() {
       )}
 
       {page === 'wheel' && (
-        <div style={{ textAlign: 'center', padding: 20 }}>
-          <h2 style={{ color: '#22c55e' }}>🎡 Roue de la Fortune</h2>
-          <p style={{ color: '#4ade80' }}>1 fois par jour</p>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ color: '#22c55e', marginBottom: 10 }}>🎡 Roue de la Fortune</h2>
+          <p style={{ color: '#4ade80', marginBottom: 20 }}>1 fois par jour • Très faible chance de Xanax</p>
+
+          {/* La roue */}
+          <div style={{ position: 'relative', width: 280, height: 280, margin: '0 auto 20px' }}>
+            <div style={{
+              width: 280,
+              height: 280,
+              borderRadius: '50%',
+              border: '8px solid #22c55e',
+              overflow: 'hidden',
+              transition: spinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
+              transform: `rotate(${rotation}deg)`,
+              background: '#111'
+            }}>
+              {WHEEL_PRIZES.map((prize, i) => {
+                const angle = (360 / WHEEL_PRIZES.length) * i
+                return (
+                  <div key={i} style={{
+                    position: 'absolute',
+                    width: '50%',
+                    height: '50%',
+                    top: 0,
+                    left: '50%',
+                    transformOrigin: '0% 100%',
+                    transform: `rotate(${angle}deg)`,
+                    background: prize.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 'bold',
+                    color: '#fff',
+                    paddingLeft: 10
+                  }}>
+                    {prize.label}
+                  </div>
+                )
+              })}
+            </div>
+            {/* Flèche */}
+            <div style={{
+              position: 'absolute',
+              top: -15,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 0,
+              height: 0,
+              borderLeft: '14px solid transparent',
+              borderRight: '14px solid transparent',
+              borderBottom: '24px solid #fbbf24',
+              zIndex: 10
+            }} />
+          </div>
+
           <button
             onClick={spinWheel}
             disabled={spinning || !canSpinToday()}
@@ -298,14 +359,23 @@ function App() {
               opacity: spinning || !canSpinToday() ? 0.5 : 1,
               background: spinning || !canSpinToday() ? '#333' : '#14532d',
               fontSize: 18,
-              padding: 20,
-              marginTop: 20
+              padding: '16px 30px'
             }}
           >
-            {spinning ? 'Tourne...' : !canSpinToday() ? "Déjà utilisé" : 'TOURNER'}
+            {spinning ? 'La roue tourne...' : !canSpinToday() ? "Déjà utilisé aujourd'hui" : 'TOURNER LA ROUE'}
           </button>
+
           {wheelResult && (
-            <div style={{ marginTop: 30, padding: 20, border: '2px solid #22c55e', borderRadius: 12, color: '#22c55e', fontWeight: 'bold' }}>
+            <div style={{
+              marginTop: 25,
+              padding: 18,
+              background: '#0a0a0a',
+              border: '2px solid #22c55e',
+              borderRadius: 12,
+              color: '#22c55e',
+              fontWeight: 'bold',
+              fontSize: 18
+            }}>
               {wheelResult}
             </div>
           )}
