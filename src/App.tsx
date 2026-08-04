@@ -144,7 +144,7 @@ function App() {
     }
 
     const segment = 360 / WHEEL_PRIZES.length
-    const finalRotation = 1800 + (360 - (selectedIndex * segment + segment / 2))
+    const finalRotation = 1800 + (360 - (selectedIndex * segment) - (segment / 2))
     setRotation(finalRotation)
 
     setTimeout(() => {
