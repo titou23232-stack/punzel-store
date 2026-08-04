@@ -20,14 +20,14 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const WHEEL_PRIZES = [
-  { label: 'PERDU', type: 'lose', weight: 45, color: '#333' },
-  { label: '+10 XP', type: 'xp', value: 10, weight: 20, color: '#14532d' },
-  { label: '+20 XP', type: 'xp', value: 20, weight: 15, color: '#166534' },
-  { label: '+30 XP', type: 'xp', value: 30, weight: 10, color: '#15803d' },
-  { label: '+50 XP', type: 'xp', value: 50, weight: 7, color: '#22c55e' },
-  { label: 'PERDU', type: 'lose', weight: 15, color: '#222' },
+  { label: 'PERDU', type: 'lose', weight: 40, color: '#1a1a1a' },
+  { label: '+10 XP', type: 'xp', value: 10, weight: 18, color: '#14532d' },
+  { label: '+20 XP', type: 'xp', value: 20, weight: 14, color: '#166534' },
+  { label: 'PERDU', type: 'lose', weight: 12, color: '#111' },
+  { label: '+30 XP', type: 'xp', value: 30, weight: 8, color: '#15803d' },
+  { label: '+50 XP', type: 'xp', value: 50, weight: 5, color: '#22c55e' },
+  { label: 'PERDU', type: 'lose', weight: 10, color: '#0a0a0a' },
   { label: 'Boîte Xanax', type: 'xanax', weight: 2, color: '#fbbf24' },
-  { label: 'PERDU', type: 'lose', weight: 10, color: '#111' },
 ]
 
 const canSpinToday = () => {
@@ -53,6 +53,8 @@ function App() {
   const [xp, setXp] = useState(0)
   const [orders, setOrders] = useState(0)
   const [adminOrders, setAdminOrders] = useState<any[]>([])
+  const [referralCode, setReferralCode] = useState('')
+  const [myReferralCode, setMyReferralCode] = useState('')
 
   const [form, setForm] = useState({
     quantity: '',
@@ -69,7 +71,10 @@ function App() {
     if (tg) {
       tg.ready()
       tg.expand()
-      if (tg.initDataUnsafe?.user) setUser(tg.initDataUnsafe.user)
+      if (tg.initDataUnsafe?.user) {
+        setUser(tg.initDataUnsafe.user)
+        setMyReferralCode(`PUNZEL${tg.initDataUnsafe.user.id}`)
+      }
     }
     const savedXp = localStorage.getItem('xp')
     const savedOrders = localStorage.getItem('orders')
@@ -106,6 +111,8 @@ function App() {
   }
 
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const discount = xp >= 1000 ? 0.10 : 0
+  const totalAfterDiscount = total * (1 - discount)
   const cartCount = cart.reduce((sum, i) => sum + i.quantity, 0)
   const level = Math.floor(xp / 100) + 1
   const xpInLevel = xp % 100
@@ -151,6 +158,27 @@ function App() {
     }, 4000)
   }
 
+  const applyReferral = () => {
+    if (!referralCode.trim()) {
+      alert('Entre un code de parrainage')
+      return
+    }
+    if (referralCode === myReferralCode) {
+      alert('Tu ne peux pas utiliser ton propre code')
+      return
+    }
+    if (localStorage.getItem('usedReferral')) {
+      alert('Tu as déjà utilisé un code de parrainage')
+      return
+    }
+    const newXp = xp + 50
+    setXp(newXp)
+    localStorage.setItem('xp', String(newXp))
+    localStorage.setItem('usedReferral', referralCode)
+    alert('Code accepté ! +50 XP')
+    setReferralCode('')
+  }
+
   const goToForm = () => {
     if (cart.length === 0) return
     setPage('form')
@@ -172,7 +200,7 @@ function App() {
       username: user.username || null,
       first_name: user.first_name || null,
       products: { items: cart, form: form },
-      total: total,
+      total: totalAfterDiscount,
       status: 'pending'
     }
 
@@ -193,14 +221,15 @@ function App() {
           order: {
             first_name: user.first_name,
             username: user.username,
-            total: total,
+            total: totalAfterDiscount,
             products: { items: cart, form: form }
           }
         })
       })
     } catch (e) {}
 
-    const gainedXp = Math.floor(total)
+    // 1 € = 1 XP
+    const gainedXp = Math.floor(totalAfterDiscount)
     const newXp = xp + gainedXp
     const newOrdersCount = orders + 1
     setXp(newXp)
@@ -217,7 +246,7 @@ function App() {
       else window.open(VINTED_URL, '_blank')
     }
 
-    alert(`Commande enregistrée !\n+${gainedXp} XP`)
+    alert(`Commande enregistrée !\nTotal: ${totalAfterDiscount.toFixed(2)} €\n+${gainedXp} XP`)
     setCart([])
     setForm({ quantity: '', fullName: '', address: '', phone: '', whatClientWants: '', birthDate: '' })
     setPage('catalog')
@@ -267,7 +296,11 @@ function App() {
                   </div>
                 </div>
               ))}
-              <h3 style={{ color: '#22c55e' }}>Total : {total.toFixed(2)} €</h3>
+              <h3 style={{ color: '#22c55e' }}>
+                Total : {total.toFixed(2)} €
+                {discount > 0 && <span style={{ color: '#fbbf24' }}> (−10 % = {totalAfterDiscount.toFixed(2)} €)</span>}
+              </h3>
+              {xp >= 1000 && <p style={{ color: '#fbbf24', fontSize: 14 }}>✓ Réduction 10 % active (1000+ XP)</p>}
               <button onClick={goToForm} style={orderBtn}>Continuer →</button>
             </>
           )}
@@ -296,20 +329,33 @@ function App() {
 
       {page === 'wheel' && (
         <div style={{ textAlign: 'center' }}>
-          <h2 style={{ color: '#22c55e', marginBottom: 10 }}>🎡 Roue de la Fortune</h2>
-          <p style={{ color: '#4ade80', marginBottom: 20 }}>1 fois par jour • Très faible chance de Xanax</p>
+          <h2 style={{ color: '#22c55e', marginBottom: 8 }}>🎡 Roue de la Fortune</h2>
+          <p style={{ color: '#4ade80', marginBottom: 20 }}>1 spin par jour</p>
 
-          {/* La roue */}
-          <div style={{ position: 'relative', width: 280, height: 280, margin: '0 auto 20px' }}>
+          <div style={{ position: 'relative', width: 300, height: 300, margin: '0 auto 25px' }}>
             <div style={{
-              width: 280,
-              height: 280,
+              position: 'absolute',
+              top: -18,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 0,
+              height: 0,
+              borderLeft: '16px solid transparent',
+              borderRight: '16px solid transparent',
+              borderBottom: '28px solid #22c55e',
+              zIndex: 20
+            }} />
+
+            <div style={{
+              width: 300,
+              height: 300,
               borderRadius: '50%',
-              border: '8px solid #22c55e',
+              border: '10px solid #22c55e',
               overflow: 'hidden',
               transition: spinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
               transform: `rotate(${rotation}deg)`,
-              background: '#111'
+              background: '#0a0a0a',
+              position: 'relative'
             }}>
               {WHEEL_PRIZES.map((prize, i) => {
                 const angle = (360 / WHEEL_PRIZES.length) * i
@@ -323,46 +369,58 @@ function App() {
                     transformOrigin: '0% 100%',
                     transform: `rotate(${angle}deg)`,
                     background: prize.color,
+                    borderRight: '1px solid #22c55e',
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'center',
-                    fontSize: 11,
+                    paddingTop: 18,
+                    fontSize: 12,
                     fontWeight: 'bold',
-                    color: '#fff',
-                    paddingLeft: 10
+                    color: prize.type === 'xanax' ? '#000' : '#fff'
                   }}>
-                    {prize.label}
+                    <span style={{ transform: 'rotate(22deg)' }}>{prize.label}</span>
                   </div>
                 )
               })}
             </div>
-            {/* Flèche */}
+
             <div style={{
               position: 'absolute',
-              top: -15,
+              top: '50%',
               left: '50%',
-              transform: 'translateX(-50%)',
-              width: 0,
-              height: 0,
-              borderLeft: '14px solid transparent',
-              borderRight: '14px solid transparent',
-              borderBottom: '24px solid #fbbf24',
+              transform: 'translate(-50%, -50%)',
+              width: 50,
+              height: 50,
+              borderRadius: '50%',
+              background: '#14532d',
+              border: '4px solid #22c55e',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 22,
               zIndex: 10
-            }} />
+            }}>
+              🎁
+            </div>
           </div>
 
           <button
             onClick={spinWheel}
             disabled={spinning || !canSpinToday()}
             style={{
-              ...orderBtn,
-              opacity: spinning || !canSpinToday() ? 0.5 : 1,
+              width: '90%',
+              maxWidth: 320,
               background: spinning || !canSpinToday() ? '#333' : '#14532d',
+              color: '#22c55e',
+              border: '2px solid #22c55e',
+              padding: '16px 20px',
+              borderRadius: 12,
+              fontWeight: 'bold',
               fontSize: 18,
-              padding: '16px 30px'
+              opacity: spinning || !canSpinToday() ? 0.6 : 1
             }}
           >
-            {spinning ? 'La roue tourne...' : !canSpinToday() ? "Déjà utilisé aujourd'hui" : 'TOURNER LA ROUE'}
+            {spinning ? 'La roue tourne...' : !canSpinToday() ? "Déjà utilisé aujourd'hui" : 'Lancer la roue'}
           </button>
 
           {wheelResult && (
@@ -396,9 +454,25 @@ function App() {
             <p style={{ color: '#4ade80' }}>Niveau : <strong style={{ color: '#22c55e' }}>{level}</strong></p>
             <p style={{ color: '#4ade80' }}>XP : <strong style={{ color: '#22c55e' }}>{xp}</strong></p>
             <p style={{ color: '#4ade80' }}>Commandes : <strong style={{ color: '#22c55e' }}>{orders}</strong></p>
+            {xp >= 1000 && <p style={{ color: '#fbbf24' }}>✓ Réduction 10 % active</p>}
             <div style={{ background: '#14532d', height: 10, borderRadius: 5, marginTop: 8 }}>
               <div style={{ background: '#22c55e', height: '100%', width: `${xpInLevel}%`, borderRadius: 5 }} />
             </div>
+
+            <hr style={{ borderColor: '#14532d', margin: '16px 0' }} />
+            <h3 style={{ color: '#22c55e', marginBottom: 8 }}>Parrainage</h3>
+            <p style={{ color: '#4ade80', fontSize: 13 }}>Ton code : <strong style={{ color: '#22c55e' }}>{myReferralCode || '...'}</strong></p>
+            <p style={{ color: '#4ade80', fontSize: 12, marginBottom: 10 }}>Partage ton code. Chaque filleul te rapporte 50 XP.</p>
+            
+            <input
+              placeholder="Code de parrainage"
+              value={referralCode}
+              onChange={e => setReferralCode(e.target.value)}
+              style={inputStyle}
+            />
+            <button onClick={applyReferral} style={{ ...orderBtn, marginTop: 8 }}>
+              Utiliser un code (+50 XP)
+            </button>
           </div>
         </div>
       )}
