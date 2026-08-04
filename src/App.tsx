@@ -342,17 +342,25 @@ function App() {
           <h2 style={{ color: '#22c55e', marginBottom: 6 }}>Roue de la Fortune</h2>
           <p style={{ color: '#4ade80', marginBottom: 16, fontSize: 14 }}>1 spin par jour</p>
 
-          <div style={{ position: 'relative', width: 300, height: 300, margin: '0 auto 24px' }}>
+          <div style={{ 
+            position: 'relative', 
+            width: 300, 
+            height: 300, 
+            margin: '0 auto 24px',
+            borderRadius: '50%',
+            border: '6px solid #22c55e',
+            overflow: 'hidden'
+          }}>
             <img
               src={WHEEL_IMAGE}
               alt="Roue"
               style={{
-                width: 300,
-                height: 300,
+                width: '100%',
+                height: '100%',
                 borderRadius: '50%',
                 transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                 transform: `rotate(${rotation}deg)`,
-                border: '6px solid #22c55e'
+                objectFit: 'cover'
               }}
             />
           </div>
