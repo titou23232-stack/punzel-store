@@ -21,17 +21,18 @@ type Product = {
 
 type CartItem = Product & { quantity: number }
 
+// Ordre des segments en partant du haut (sous la flèche) dans le sens des aiguilles d'une montre
 const WHEEL_PRIZES = [
-  { label: 'PERDU', type: 'lose', weight: 25 },
-  { label: '+20 XP', type: 'xp', value: 20, weight: 18 },
-  { label: '+20 XP', type: 'xp', value: 20, weight: 18 },
-  { label: 'PERDU', type: 'lose', weight: 15 },
-  { label: '+50 XP', type: 'xp', value: 50, weight: 8 },
-  { label: '+20 XP', type: 'xp', value: 20, weight: 10 },
-  { label: 'PERDU', type: 'lose', weight: 10 },
-  { label: '+20 XP', type: 'xp', value: 20, weight: 8 },
-  { label: '+50 XP', type: 'xp', value: 50, weight: 5 },
-  { label: 'Boîte Xanax', type: 'xanax', weight: 1 },
+  { label: 'PERDU', type: 'lose' },
+  { label: '+20 XP', type: 'xp', value: 20 },
+  { label: 'PERDU', type: 'lose' },
+  { label: '+50 XP', type: 'xp', value: 50 },
+  { label: '+20 XP', type: 'xp', value: 20 },
+  { label: 'PERDU', type: 'lose' },
+  { label: '+50 XP', type: 'xp', value: 50 },
+  { label: '+20 XP', type: 'xp', value: 20 },
+  { label: 'Boîte Xanax', type: 'xanax' },
+  { label: 'PERDU', type: 'lose' },
 ]
 
 const PRODUCTS: Product[] = [
@@ -125,20 +126,20 @@ function App() {
     setSpinning(true)
     setWheelResult(null)
 
-    const totalWeight = WHEEL_PRIZES.reduce((s, p) => s + p.weight, 0)
-    let r = Math.random() * totalWeight
-    let selected = WHEEL_PRIZES[0]
+    // Choisit un index au hasard (avec plus de chance pour PERDU)
+    const random = Math.random()
     let selectedIndex = 0
+    if (random < 0.40) selectedIndex = 0 // PERDU
+    else if (random < 0.55) selectedIndex = 1 // +20
+    else if (random < 0.65) selectedIndex = 2 // PERDU
+    else if (random < 0.75) selectedIndex = 3 // +50
+    else if (random < 0.85) selectedIndex = 4 // +20
+    else if (random < 0.92) selectedIndex = 5 // PERDU
+    else if (random < 0.97) selectedIndex = 6 // +50
+    else if (random < 0.99) selectedIndex = 7 // +20
+    else selectedIndex = 8 // Boîte Xanax (très rare)
 
-    for (let i = 0; i < WHEEL_PRIZES.length; i++) {
-      if (r < WHEEL_PRIZES[i].weight) {
-        selected = WHEEL_PRIZES[i]
-        selectedIndex = i
-        break
-      }
-      r -= WHEEL_PRIZES[i].weight
-    }
-
+    const selected = WHEEL_PRIZES[selectedIndex]
     const segment = 360 / WHEEL_PRIZES.length
     const extraSpins = 6 * 360
     const targetAngle = 360 - (selectedIndex * segment + segment / 2)
