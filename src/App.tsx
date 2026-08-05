@@ -154,7 +154,6 @@ function App() {
         localStorage.setItem('xp', String(newXp))
         resultText = `🎉 +${selected.value} XP !`
       } else if (selected.type === 'xanax') {
-        // Boîte de Xanax OFFERTE
         const xanaxProduct = PRODUCTS.find(p => p.id === 1)
         if (xanaxProduct) {
           setCart(prev => {
@@ -357,19 +356,19 @@ function App() {
             height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* Une seule flèche fixe en haut */}
+            {/* Flèche fixe (la seule) */}
             <div style={{
               position: 'absolute',
-              top: -18,
+              top: -16,
               left: '50%',
               transform: 'translateX(-50%)',
               width: 0,
               height: 0,
-              borderLeft: '13px solid transparent',
-              borderRight: '13px solid transparent',
-              borderTop: '22px solid #facc15',
+              borderLeft: '12px solid transparent',
+              borderRight: '12px solid transparent',
+              borderTop: '20px solid #facc15',
               zIndex: 30,
-              filter: 'drop-shadow(0 0 8px #facc15)'
+              filter: 'drop-shadow(0 0 6px #facc15)'
             }} />
 
             {/* Cercle vert qui contient la roue */}
@@ -379,14 +378,16 @@ function App() {
               borderRadius: '50%',
               overflow: 'hidden',
               border: '8px solid #22c55e',
-              boxShadow: '0 0 15px rgba(34, 197, 94, 0.4)'
+              boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)'
             }}>
               <img
                 src={WHEEL_IMAGE}
                 alt="Roue"
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  width: '115%',
+                  height: '115%',
+                  marginLeft: '-7.5%',
+                  marginTop: '-7.5%',
                   borderRadius: '50%',
                   transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                   transform: `rotate(${rotation}deg)`,
