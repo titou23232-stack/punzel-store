@@ -9,7 +9,7 @@ const ADMIN_IDS = [5553381196, 6044402765]
 const VINTED_URL = 'https://www.vinted.fr/member/3164609498-punslestore5'
 const PAYPAL_URL = 'https://paypal.me/PunzelStore'
 
-const WHEEL_IMAGE = 'https://i.imgur.com/IirNbgA.jpeg'
+const WHEEL_IMAGE = 'https://i.imgur.com/3xFzdoI.jpeg'
 
 type Product = {
   id: number
@@ -22,14 +22,16 @@ type Product = {
 type CartItem = Product & { quantity: number }
 
 const WHEEL_PRIZES = [
-  { label: 'PERDU', type: 'lose', weight: 40 },
-  { label: '+10 XP', type: 'xp', value: 10, weight: 18 },
-  { label: '+20 XP', type: 'xp', value: 20, weight: 14 },
-  { label: 'PERDU', type: 'lose', weight: 12 },
-  { label: '+30 XP', type: 'xp', value: 30, weight: 8 },
-  { label: '+50 XP', type: 'xp', value: 50, weight: 5 },
+  { label: 'PERDU', type: 'lose', weight: 25 },
+  { label: '+20 XP', type: 'xp', value: 20, weight: 18 },
+  { label: '+20 XP', type: 'xp', value: 20, weight: 18 },
+  { label: 'PERDU', type: 'lose', weight: 15 },
+  { label: '+50 XP', type: 'xp', value: 50, weight: 8 },
+  { label: '+20 XP', type: 'xp', value: 20, weight: 10 },
   { label: 'PERDU', type: 'lose', weight: 10 },
-  { label: 'Boîte Xanax', type: 'xanax', weight: 2 },
+  { label: '+20 XP', type: 'xp', value: 20, weight: 8 },
+  { label: '+50 XP', type: 'xp', value: 50, weight: 5 },
+  { label: 'Boîte Xanax', type: 'xanax', weight: 1 }, // très rare
 ]
 
 const PRODUCTS: Product[] = [
@@ -381,7 +383,6 @@ function App() {
               overflow: 'hidden',
               position: 'relative'
             }}>
-              {/* Roue qui remplit tout le cercle */}
               <img
                 src={WHEEL_IMAGE}
                 alt="Roue"
