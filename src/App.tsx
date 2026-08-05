@@ -9,7 +9,7 @@ const ADMIN_IDS = [5553381196, 6044402765]
 const VINTED_URL = 'https://www.vinted.fr/member/3164609498-punslestore5'
 const PAYPAL_URL = 'https://paypal.me/PunzelStore'
 
-const WHEEL_IMAGE = 'https://i.imgur.com/fxIuB8y.jpeg'
+const WHEEL_IMAGE = 'https://i.imgur.com/aKPDpYT.jpeg'
 
 type Product = {
   id: number
@@ -137,7 +137,7 @@ function App() {
       r -= WHEEL_PRIZES[i].weight
     }
 
-    // Rotation uniquement dans le sens des aiguilles d'une montre
+    // Rotation dans le sens des aiguilles d'une montre
     const segment = 360 / WHEEL_PRIZES.length
     const extraSpins = 5 * 360
     const targetAngle = 360 - (selectedIndex * segment + segment / 2)
@@ -356,38 +356,34 @@ function App() {
             height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* Flèche fixe (la seule) */}
+            {/* Flèche fixe en haut au milieu */}
             <div style={{
               position: 'absolute',
-              top: -16,
+              top: -18,
               left: '50%',
               transform: 'translateX(-50%)',
               width: 0,
               height: 0,
-              borderLeft: '12px solid transparent',
-              borderRight: '12px solid transparent',
-              borderTop: '20px solid #facc15',
+              borderLeft: '13px solid transparent',
+              borderRight: '13px solid transparent',
+              borderTop: '22px solid #facc15',
               zIndex: 30,
-              filter: 'drop-shadow(0 0 6px #facc15)'
+              filter: 'drop-shadow(0 0 8px #facc15)'
             }} />
 
-            {/* Cercle vert qui contient la roue */}
+            {/* Roue */}
             <div style={{ 
               width: 300, 
               height: 300, 
               borderRadius: '50%',
-              overflow: 'hidden',
-              border: '8px solid #22c55e',
-              boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)'
+              overflow: 'hidden'
             }}>
               <img
                 src={WHEEL_IMAGE}
                 alt="Roue"
                 style={{
-                  width: '115%',
-                  height: '115%',
-                  marginLeft: '-7.5%',
-                  marginTop: '-7.5%',
+                  width: '100%',
+                  height: '100%',
                   borderRadius: '50%',
                   transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                   transform: `rotate(${rotation}deg)`,
