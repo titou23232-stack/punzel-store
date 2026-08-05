@@ -21,7 +21,6 @@ type Product = {
 
 type CartItem = Product & { quantity: number }
 
-// Ordre des segments en partant du haut (sous la flèche) dans le sens des aiguilles d'une montre
 const WHEEL_PRIZES = [
   { label: 'PERDU', type: 'lose' },
   { label: '+20 XP', type: 'xp', value: 20 },
@@ -34,6 +33,12 @@ const WHEEL_PRIZES = [
   { label: 'Boîte Xanax', type: 'xanax' },
   { label: 'PERDU', type: 'lose' },
 ]
+
+const canSpinToday = () => {
+  const last = localStorage.getItem('lastWheelSpin')
+  if (!last) return true
+  return new Date(last).toDateString() !== new Date().toDateString()
+}
 
 const PRODUCTS: Product[] = [
   { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété.' },
@@ -122,22 +127,21 @@ function App() {
   const hasProduct = (id: number) => cart.some(i => i.id === id)
 
   const spinWheel = () => {
-    if (spinning) return
+    if (spinning || !canSpinToday()) return
     setSpinning(true)
     setWheelResult(null)
 
-    // Choisit un index au hasard (avec plus de chance pour PERDU)
     const random = Math.random()
     let selectedIndex = 0
-    if (random < 0.40) selectedIndex = 0 // PERDU
-    else if (random < 0.55) selectedIndex = 1 // +20
-    else if (random < 0.65) selectedIndex = 2 // PERDU
-    else if (random < 0.75) selectedIndex = 3 // +50
-    else if (random < 0.85) selectedIndex = 4 // +20
-    else if (random < 0.92) selectedIndex = 5 // PERDU
-    else if (random < 0.97) selectedIndex = 6 // +50
-    else if (random < 0.99) selectedIndex = 7 // +20
-    else selectedIndex = 8 // Boîte Xanax (très rare)
+    if (random < 0.40) selectedIndex = 0
+    else if (random < 0.55) selectedIndex = 1
+    else if (random < 0.65) selectedIndex = 2
+    else if (random < 0.75) selectedIndex = 3
+    else if (random < 0.85) selectedIndex = 4
+    else if (random < 0.92) selectedIndex = 5
+    else if (random < 0.97) selectedIndex = 6
+    else if (random < 0.99) selectedIndex = 7
+    else selectedIndex = 8
 
     const selected = WHEEL_PRIZES[selectedIndex]
     const segment = 360 / WHEEL_PRIZES.length
@@ -148,6 +152,7 @@ function App() {
 
     setTimeout(() => {
       setSpinning(false)
+      localStorage.setItem('lastWheelSpin', new Date().toISOString())
 
       let resultText = ''
       if (selected.type === 'xp') {
@@ -350,7 +355,7 @@ function App() {
       {page === 'wheel' && (
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ color: '#22c55e', marginBottom: 6 }}>Roue de la Fortune</h2>
-          <p style={{ color: '#4ade80', marginBottom: 16, fontSize: 14 }}>1 spin par jour (désactivé pour test)</p>
+          <p style={{ color: '#4ade80', marginBottom: 16, fontSize: 14 }}>1 spin par jour</p>
 
           <div style={{ 
             position: 'relative', 
@@ -358,7 +363,6 @@ function App() {
             height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* Flèche fixe */}
             <div style={{
               position: 'absolute',
               top: -18,
@@ -373,7 +377,6 @@ function App() {
               filter: 'drop-shadow(0 0 8px #facc15)'
             }} />
 
-            {/* Cercle vert fluo FIXE */}
             <div style={{ 
               width: 300, 
               height: 300, 
@@ -403,21 +406,21 @@ function App() {
 
           <button
             onClick={spinWheel}
-            disabled={spinning}
+            disabled={spinning || !canSpinToday()}
             style={{
               width: '90%',
               maxWidth: 320,
-              background: spinning ? '#333' : '#facc15',
+              background: (spinning || !canSpinToday()) ? '#333' : '#facc15',
               color: '#000',
               border: 'none',
               padding: '16px 20px',
               borderRadius: 14,
               fontWeight: 'bold',
               fontSize: 18,
-              opacity: spinning ? 0.6 : 1
+              opacity: (spinning || !canSpinToday()) ? 0.6 : 1
             }}
           >
-            {spinning ? 'La roue tourne...' : '🎰 Lancer la roue'}
+            {spinning ? 'La roue tourne...' : !canSpinToday() ? "Déjà utilisé aujourd'hui" : '🎰 Lancer la roue'}
           </button>
 
           {wheelResult && (
