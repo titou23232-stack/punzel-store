@@ -151,7 +151,6 @@ function App() {
         localStorage.setItem('xp', String(newXp))
         resultText = `🎉 +${selected.value} XP !`
       } else if (selected.type === 'xanax') {
-        // Ajoute automatiquement la Boîte de Xanax au panier
         const xanaxProduct = PRODUCTS.find(p => p.id === 1)
         if (xanaxProduct) {
           setCart(prev => {
@@ -350,23 +349,44 @@ function App() {
             position: 'relative', 
             width: 310, 
             height: 310, 
-            margin: '0 auto 24px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            border: '8px solid #22c55e'
+            margin: '0 auto 24px'
           }}>
-            <img
-              src={WHEEL_IMAGE}
-              alt="Roue"
-              style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: '50%',
-                transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
-                transform: `rotate(${rotation}deg)`,
-                objectFit: 'cover'
-              }}
-            />
+            {/* Flèche fixe */}
+            <div style={{
+              position: 'absolute',
+              top: -18,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 0,
+              height: 0,
+              borderLeft: '12px solid transparent',
+              borderRight: '12px solid transparent',
+              borderBottom: '22px solid #facc15',
+              zIndex: 20,
+              filter: 'drop-shadow(0 0 6px #facc15)'
+            }} />
+
+            {/* Roue qui tourne */}
+            <div style={{ 
+              width: 310, 
+              height: 310, 
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '8px solid #22c55e'
+            }}>
+              <img
+                src={WHEEL_IMAGE}
+                alt="Roue"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
+                  transform: `rotate(${rotation}deg)`,
+                  objectFit: 'cover'
+                }}
+              />
+            </div>
           </div>
 
           <button
