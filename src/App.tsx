@@ -151,17 +151,18 @@ function App() {
         localStorage.setItem('xp', String(newXp))
         resultText = `🎉 +${selected.value} XP !`
       } else if (selected.type === 'xanax') {
+        // Ajoute la Boîte de Xanax GRATUITEMENT au panier
         const xanaxProduct = PRODUCTS.find(p => p.id === 1)
         if (xanaxProduct) {
           setCart(prev => {
-            const existing = prev.find(i => i.id === 1)
+            const existing = prev.find(i => i.id === 1 && i.price === 0)
             if (existing) {
-              return prev.map(i => i.id === 1 ? { ...i, quantity: i.quantity + 1 } : i)
+              return prev.map(i => (i.id === 1 && i.price === 0) ? { ...i, quantity: i.quantity + 1 } : i)
             }
-            return [...prev, { ...xanaxProduct, quantity: 1 }]
+            return [...prev, { ...xanaxProduct, price: 0, name: 'Boîte Xanax (OFFERTE)', quantity: 1 }]
           })
         }
-        resultText = '💊 JACKPOT ! Boîte de Xanax ajoutée au panier !'
+        resultText = '💊 JACKPOT ! Boîte de Xanax offerte ajoutée au panier !'
       } else {
         resultText = '😢 Perdu...'
       }
@@ -298,10 +299,12 @@ function App() {
           {cart.length === 0 ? <p style={{ textAlign: 'center', color: '#4ade80' }}>Panier vide</p> : (
             <>
               {cart.map(item => (
-                <div key={item.id} style={{ ...cardStyle, justifyContent: 'space-between' }}>
+                <div key={item.id + '-' + item.price} style={{ ...cardStyle, justifyContent: 'space-between' }}>
                   <div>
                     <strong style={{ color: '#22c55e' }}>{item.name}</strong>
-                    <div style={{ fontSize: 13, color: '#4ade80' }}>{item.price} € × {item.quantity}</div>
+                    <div style={{ fontSize: 13, color: item.price === 0 ? '#fbbf24' : '#4ade80' }}>
+                      {item.price === 0 ? 'OFFERT' : `${item.price} €`} × {item.quantity}
+                    </div>
                   </div>
                   <div>
                     <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={qtyBtn}>-</button>
@@ -351,19 +354,19 @@ function App() {
             height: 310, 
             margin: '0 auto 24px'
           }}>
-            {/* Flèche fixe */}
+            {/* Flèche jaune fluo fixe - pointe vers le bas */}
             <div style={{
               position: 'absolute',
-              top: -18,
+              top: -20,
               left: '50%',
               transform: 'translateX(-50%)',
               width: 0,
               height: 0,
-              borderLeft: '12px solid transparent',
-              borderRight: '12px solid transparent',
-              borderBottom: '22px solid #facc15',
-              zIndex: 20,
-              filter: 'drop-shadow(0 0 6px #facc15)'
+              borderLeft: '14px solid transparent',
+              borderRight: '14px solid transparent',
+              borderTop: '24px solid #facc15',
+              zIndex: 30,
+              filter: 'drop-shadow(0 0 8px #facc15)'
             }} />
 
             {/* Roue qui tourne */}
