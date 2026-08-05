@@ -137,7 +137,7 @@ function App() {
       r -= WHEEL_PRIZES[i].weight
     }
 
-    // Rotation dans le sens des aiguilles d'une montre
+    // Rotation uniquement dans le sens des aiguilles d'une montre
     const segment = 360 / WHEEL_PRIZES.length
     const extraSpins = 5 * 360
     const targetAngle = 360 - (selectedIndex * segment + segment / 2)
@@ -356,7 +356,7 @@ function App() {
             height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* Flèche fixe */}
+            {/* Flèche fixe qui ne bouge jamais */}
             <div style={{
               position: 'absolute',
               top: -18,
@@ -376,13 +376,12 @@ function App() {
               width: 300, 
               height: 300, 
               borderRadius: '50%',
-              border: '10px solid #39ff14',
-              boxShadow: '0 0 20px #39ff14',
+              border: '12px solid #39ff14',
+              boxShadow: '0 0 25px #39ff14',
               overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              position: 'relative'
             }}>
+              {/* La roue tourne à l'intérieur */}
               <img
                 src={WHEEL_IMAGE}
                 alt="Roue"
@@ -392,7 +391,8 @@ function App() {
                   borderRadius: '50%',
                   transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                   transform: `rotate(${rotation}deg)`,
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  display: 'block'
                 }}
               />
             </div>
