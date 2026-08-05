@@ -137,9 +137,9 @@ function App() {
       r -= WHEEL_PRIZES[i].weight
     }
 
-    // Rotation dans le sens des aiguilles d'une montre uniquement
+    // Rotation uniquement dans le sens des aiguilles d'une montre
     const segment = 360 / WHEEL_PRIZES.length
-    const extraSpins = 5 * 360 // 5 tours complets
+    const extraSpins = 5 * 360
     const targetAngle = 360 - (selectedIndex * segment + segment / 2)
     const finalRotation = extraSpins + targetAngle
     setRotation(prev => prev + finalRotation)
@@ -154,7 +154,7 @@ function App() {
         localStorage.setItem('xp', String(newXp))
         resultText = `🎉 +${selected.value} XP !`
       } else if (selected.type === 'xanax') {
-        // Ajoute la Boîte de Xanax GRATUITEMENT
+        // Boîte de Xanax OFFERTE
         const xanaxProduct = PRODUCTS.find(p => p.id === 1)
         if (xanaxProduct) {
           setCart(prev => {
@@ -357,7 +357,7 @@ function App() {
             height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* UNE SEULE flèche fixe en haut au milieu */}
+            {/* Une seule flèche fixe en haut */}
             <div style={{
               position: 'absolute',
               top: -18,
@@ -372,7 +372,7 @@ function App() {
               filter: 'drop-shadow(0 0 8px #facc15)'
             }} />
 
-            {/* Cercle vert qui bloque la roue */}
+            {/* Cercle vert qui contient la roue */}
             <div style={{ 
               width: 300, 
               height: 300, 
