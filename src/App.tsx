@@ -349,14 +349,17 @@ function App() {
             margin: '0 auto 24px',
             borderRadius: '50%',
             border: '6px solid #22c55e',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
             <img
               src={WHEEL_IMAGE}
               alt="Roue"
               style={{
-                width: '100%',
-                height: '100%',
+                width: '104%',
+                height: '104%',
                 borderRadius: '50%',
                 transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                 transform: `rotate(${rotation}deg)`,
