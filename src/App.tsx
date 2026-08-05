@@ -137,8 +137,11 @@ function App() {
       r -= WHEEL_PRIZES[i].weight
     }
 
+    // Rotation dans le sens des aiguilles d'une montre uniquement
     const segment = 360 / WHEEL_PRIZES.length
-    const finalRotation = 1800 + (360 - (selectedIndex * segment) - (segment / 2))
+    const extraSpins = 5 * 360 // 5 tours complets
+    const targetAngle = 360 - (selectedIndex * segment + segment / 2)
+    const finalRotation = extraSpins + targetAngle
     setRotation(prev => prev + finalRotation)
 
     setTimeout(() => {
@@ -151,7 +154,7 @@ function App() {
         localStorage.setItem('xp', String(newXp))
         resultText = `🎉 +${selected.value} XP !`
       } else if (selected.type === 'xanax') {
-        // Ajoute la Boîte de Xanax GRATUITEMENT au panier
+        // Ajoute la Boîte de Xanax GRATUITEMENT
         const xanaxProduct = PRODUCTS.find(p => p.id === 1)
         if (xanaxProduct) {
           setCart(prev => {
@@ -350,32 +353,33 @@ function App() {
 
           <div style={{ 
             position: 'relative', 
-            width: 310, 
-            height: 310, 
+            width: 300, 
+            height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* Flèche jaune fluo fixe - pointe vers le bas */}
+            {/* UNE SEULE flèche fixe en haut au milieu */}
             <div style={{
               position: 'absolute',
-              top: -20,
+              top: -18,
               left: '50%',
               transform: 'translateX(-50%)',
               width: 0,
               height: 0,
-              borderLeft: '14px solid transparent',
-              borderRight: '14px solid transparent',
-              borderTop: '24px solid #facc15',
+              borderLeft: '13px solid transparent',
+              borderRight: '13px solid transparent',
+              borderTop: '22px solid #facc15',
               zIndex: 30,
               filter: 'drop-shadow(0 0 8px #facc15)'
             }} />
 
-            {/* Roue qui tourne */}
+            {/* Cercle vert qui bloque la roue */}
             <div style={{ 
-              width: 310, 
-              height: 310, 
+              width: 300, 
+              height: 300, 
               borderRadius: '50%',
               overflow: 'hidden',
-              border: '8px solid #22c55e'
+              border: '8px solid #22c55e',
+              boxShadow: '0 0 15px rgba(34, 197, 94, 0.4)'
             }}>
               <img
                 src={WHEEL_IMAGE}
