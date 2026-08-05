@@ -32,12 +32,6 @@ const WHEEL_PRIZES = [
   { label: 'Boîte Xanax', type: 'xanax', weight: 2 },
 ]
 
-const canSpinToday = () => {
-  const last = localStorage.getItem('lastWheelSpin')
-  if (!last) return true
-  return new Date(last).toDateString() !== new Date().toDateString()
-}
-
 const PRODUCTS: Product[] = [
   { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété.' },
   { id: 2, name: 'Ordonnance', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale.' },
@@ -125,7 +119,7 @@ function App() {
   const hasProduct = (id: number) => cart.some(i => i.id === id)
 
   const spinWheel = () => {
-    if (spinning || !canSpinToday()) return
+    if (spinning) return
     setSpinning(true)
     setWheelResult(null)
 
@@ -145,11 +139,10 @@ function App() {
 
     const segment = 360 / WHEEL_PRIZES.length
     const finalRotation = 1800 + (360 - (selectedIndex * segment) - (segment / 2))
-    setRotation(finalRotation)
+    setRotation(prev => prev + finalRotation)
 
     setTimeout(() => {
       setSpinning(false)
-      localStorage.setItem('lastWheelSpin', new Date().toISOString())
 
       let resultText = ''
       if (selected.type === 'xp') {
@@ -158,7 +151,18 @@ function App() {
         localStorage.setItem('xp', String(newXp))
         resultText = `🎉 +${selected.value} XP !`
       } else if (selected.type === 'xanax') {
-        resultText = '💊 JACKPOT ! Boîte de Xanax ! Contacte un admin.'
+        // Ajoute automatiquement la Boîte de Xanax au panier
+        const xanaxProduct = PRODUCTS.find(p => p.id === 1)
+        if (xanaxProduct) {
+          setCart(prev => {
+            const existing = prev.find(i => i.id === 1)
+            if (existing) {
+              return prev.map(i => i.id === 1 ? { ...i, quantity: i.quantity + 1 } : i)
+            }
+            return [...prev, { ...xanaxProduct, quantity: 1 }]
+          })
+        }
+        resultText = '💊 JACKPOT ! Boîte de Xanax ajoutée au panier !'
       } else {
         resultText = '😢 Perdu...'
       }
@@ -340,15 +344,16 @@ function App() {
       {page === 'wheel' && (
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ color: '#22c55e', marginBottom: 6 }}>Roue de la Fortune</h2>
-          <p style={{ color: '#4ade80', marginBottom: 16, fontSize: 14 }}>1 spin par jour</p>
+          <p style={{ color: '#4ade80', marginBottom: 16, fontSize: 14 }}>1 spin par jour (désactivé pour test)</p>
 
           <div style={{ 
             position: 'relative', 
-            width: 300, 
-            height: 300, 
+            width: 310, 
+            height: 310, 
             margin: '0 auto 24px',
             borderRadius: '50%',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            border: '8px solid #22c55e'
           }}>
             <img
               src={WHEEL_IMAGE}
@@ -366,21 +371,21 @@ function App() {
 
           <button
             onClick={spinWheel}
-            disabled={spinning || !canSpinToday()}
+            disabled={spinning}
             style={{
               width: '90%',
               maxWidth: 320,
-              background: spinning || !canSpinToday() ? '#333' : '#facc15',
+              background: spinning ? '#333' : '#facc15',
               color: '#000',
               border: 'none',
               padding: '16px 20px',
               borderRadius: 14,
               fontWeight: 'bold',
               fontSize: 18,
-              opacity: spinning || !canSpinToday() ? 0.6 : 1
+              opacity: spinning ? 0.6 : 1
             }}
           >
-            {spinning ? 'La roue tourne...' : !canSpinToday() ? "Déjà utilisé aujourd'hui" : '🎰 Lancer la roue'}
+            {spinning ? 'La roue tourne...' : '🎰 Lancer la roue'}
           </button>
 
           {wheelResult && (
