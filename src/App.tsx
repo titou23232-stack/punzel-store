@@ -9,7 +9,7 @@ const ADMIN_IDS = [5553381196, 6044402765]
 const VINTED_URL = 'https://www.vinted.fr/member/3164609498-punslestore5'
 const PAYPAL_URL = 'https://paypal.me/PunzelStore'
 
-const WHEEL_IMAGE = 'https://i.imgur.com/aKPDpYT.jpeg'
+const WHEEL_IMAGE = 'https://i.imgur.com/IirNbgA.jpeg'
 
 type Product = {
   id: number
@@ -356,7 +356,7 @@ function App() {
             height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* Flèche fixe en haut au milieu */}
+            {/* Flèche fixe */}
             <div style={{
               position: 'absolute',
               top: -18,
@@ -371,12 +371,17 @@ function App() {
               filter: 'drop-shadow(0 0 8px #facc15)'
             }} />
 
-            {/* Roue */}
+            {/* Cercle vert fluo FIXE */}
             <div style={{ 
               width: 300, 
               height: 300, 
               borderRadius: '50%',
-              overflow: 'hidden'
+              border: '10px solid #39ff14',
+              boxShadow: '0 0 20px #39ff14',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
               <img
                 src={WHEEL_IMAGE}
