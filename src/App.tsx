@@ -355,10 +355,10 @@ function App() {
               src={WHEEL_IMAGE}
               alt="Roue"
               style={{
-                width: '110%',
-                height: '110%',
-                marginLeft: '-5%',
-                marginTop: '-5%',
+                width: '115%',
+                height: '115%',
+                marginLeft: '-7.5%',
+                marginTop: '-7.5%',
                 borderRadius: '50%',
                 transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                 transform: `rotate(${rotation}deg)`,
