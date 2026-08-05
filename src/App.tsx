@@ -31,7 +31,7 @@ const WHEEL_PRIZES = [
   { label: 'PERDU', type: 'lose', weight: 10 },
   { label: '+20 XP', type: 'xp', value: 20, weight: 8 },
   { label: '+50 XP', type: 'xp', value: 50, weight: 5 },
-  { label: 'Boîte Xanax', type: 'xanax', weight: 1 }, // très rare
+  { label: 'Boîte Xanax', type: 'xanax', weight: 1 },
 ]
 
 const PRODUCTS: Product[] = [
@@ -139,9 +139,8 @@ function App() {
       r -= WHEEL_PRIZES[i].weight
     }
 
-    // Rotation dans le sens des aiguilles d'une montre
     const segment = 360 / WHEEL_PRIZES.length
-    const extraSpins = 5 * 360
+    const extraSpins = 6 * 360
     const targetAngle = 360 - (selectedIndex * segment + segment / 2)
     const finalRotation = extraSpins + targetAngle
     setRotation(prev => prev + finalRotation)
