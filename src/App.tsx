@@ -9,7 +9,7 @@ const ADMIN_IDS = [5553381196, 6044402765]
 const VINTED_URL = 'https://www.vinted.fr/member/3164609498-punslestore5'
 const PAYPAL_URL = 'https://paypal.me/PunzelStore'
 
-const WHEEL_IMAGE = 'https://i.imgur.com/0HmhQPD.jpeg'
+const WHEEL_IMAGE = 'https://i.imgur.com/x5DcBt6.jpeg'
 
 type Product = {
   id: number
@@ -348,7 +348,6 @@ function App() {
             height: 300, 
             margin: '0 auto 24px',
             borderRadius: '50%',
-            border: '6px solid #22c55e',
             overflow: 'hidden'
           }}>
             <img
