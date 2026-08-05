@@ -356,7 +356,7 @@ function App() {
             height: 300, 
             margin: '0 auto 24px'
           }}>
-            {/* Flèche fixe en haut */}
+            {/* Flèche fixe (la seule) */}
             <div style={{
               position: 'absolute',
               top: -16,
@@ -371,19 +371,23 @@ function App() {
               filter: 'drop-shadow(0 0 6px #facc15)'
             }} />
 
-            {/* Roue avec son propre cercle vert fluo */}
+            {/* Cercle vert qui contient la roue */}
             <div style={{ 
               width: 300, 
               height: 300, 
               borderRadius: '50%',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              border: '8px solid #22c55e',
+              boxShadow: '0 0 15px rgba(34, 197, 94, 0.5)'
             }}>
               <img
                 src={WHEEL_IMAGE}
                 alt="Roue"
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  width: '115%',
+                  height: '115%',
+                  marginLeft: '-7.5%',
+                  marginTop: '-7.5%',
                   borderRadius: '50%',
                   transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                   transform: `rotate(${rotation}deg)`,
