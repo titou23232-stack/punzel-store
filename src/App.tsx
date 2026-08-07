@@ -50,7 +50,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [cart, setCart] = useState<CartItem[]>([])
-  const [page, setPage] = useState<'catalog' | 'cart' | 'profile' | 'admin' | 'form' | 'wheel' | 'games'>('catalog')
+  const [page, setPage] = useState<'catalog' | 'cart' | 'profile' | 'admin' | 'form' | 'wheel' | 'games' | 'review'>('catalog')
   const [spinning, setSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<string | null>(null)
   const [rotation, setRotation] = useState(0)
@@ -60,6 +60,9 @@ function App() {
   const [gameHistory, setGameHistory] = useState<string[]>([])
   const [referralCode, setReferralCode] = useState('')
   const [myReferralCode, setMyReferralCode] = useState('')
+  const [rating, setRating] = useState(0)
+  const [reviewText, setReviewText] = useState('')
+  const [lastOrderTotal, setLastOrderTotal] = useState(0)
 
   const [form, setForm] = useState({
     quantity: '',
@@ -98,6 +101,52 @@ function App() {
   useEffect(() => {
     if (page === 'admin') loadAdminOrders()
   }, [page])
+
+  const validateOrder = async (orderId: number) => {
+    const { error } = await supabase.from('orders').update({ status: 'validated' }).eq('id', orderId)
+    if (!error) {
+      setAdminOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'validated' } : o))
+      alert('Commande validée !')
+    } else {
+      alert('Erreur lors de la validation')
+    }
+  }
+
+  const refuseOrder = async (orderId: number) => {
+    if (!confirm('Tu es sûr de vouloir refuser et supprimer cette commande ?')) return
+    const { error } = await supabase.from('orders').delete().eq('id', orderId)
+    if (!error) {
+      setAdminOrders(prev => prev.filter(o => o.id !== orderId))
+      alert('Commande refusée et supprimée')
+    } else {
+      alert('Erreur lors de la suppression')
+    }
+  }
+
+  const submitReview = async () => {
+    if (rating === 0) {
+      alert('Merci de mettre une note sur 5 étoiles')
+      return
+    }
+    if (!reviewText.trim()) {
+      alert('Merci d’écrire un commentaire / recommandation')
+      return
+    }
+
+    await supabase.from('reviews').insert({
+      user_id: user?.id,
+      username: user?.username || null,
+      first_name: user?.first_name || null,
+      rating: rating,
+      comment: reviewText,
+      order_total: lastOrderTotal
+    })
+
+    alert('Merci pour ton avis !')
+    setRating(0)
+    setReviewText('')
+    setPage('catalog')
+  }
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -270,10 +319,11 @@ function App() {
       else window.open(VINTED_URL, '_blank')
     }
 
-    alert(`Commande enregistrée !\nTotal: ${totalAfterDiscount.toFixed(2)} €\n+${gainedXp} XP`)
+    // On force l'avis
+    setLastOrderTotal(totalAfterDiscount)
     setCart([])
     setForm({ quantity: '', fullName: '', address: '', phone: '', whatClientWants: '', birthDate: '' })
-    setPage('catalog')
+    setPage('review')
   }
 
   if (loading) {
@@ -352,53 +402,85 @@ function App() {
         </div>
       )}
 
+      {/* ========== PAGE AVIS OBLIGATOIRE ========== */}
+      {page === 'review' && (
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ color: '#22c55e', marginBottom: 8 }}>Merci pour ta commande !</h2>
+          <p style={{ color: '#4ade80', marginBottom: 24 }}>Laisse-nous un avis obligatoire 👇</p>
+
+          <div style={{ marginBottom: 20 }}>
+            <p style={{ color: '#22c55e', marginBottom: 10 }}>Note sur 5 étoiles :</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+              {[1, 2, 3, 4, 5].map(star => (
+                <button
+                  key={star}
+                  onClick={() => setRating(star)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 36,
+                    cursor: 'pointer',
+                    color: star <= rating ? '#fbbf24' : '#333'
+                  }}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <textarea
+            placeholder="Écris ton avis / recommandation ici..."
+            value={reviewText}
+            onChange={e => setReviewText(e.target.value)}
+            style={{
+              width: '100%',
+              minHeight: 120,
+              padding: 14,
+              borderRadius: 10,
+              border: '1px solid #14532d',
+              background: '#0a0a0a',
+              color: '#22c55e',
+              fontSize: 15,
+              marginBottom: 16,
+              boxSizing: 'border-box',
+              resize: 'vertical'
+            }}
+          />
+
+          <button onClick={submitReview} style={orderBtn}>
+            Envoyer mon avis
+          </button>
+        </div>
+      )}
+
       {page === 'wheel' && (
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ color: '#22c55e', marginBottom: 6 }}>Roue de la Fortune</h2>
           <p style={{ color: '#4ade80', marginBottom: 16, fontSize: 14 }}>1 spin par jour</p>
 
-          <div style={{ 
-            position: 'relative', 
-            width: 300, 
-            height: 300, 
-            margin: '0 auto 24px'
-          }}>
+          <div style={{ position: 'relative', width: 300, height: 300, margin: '0 auto 24px' }}>
             <div style={{
-              position: 'absolute',
-              top: -18,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 0,
-              height: 0,
-              borderLeft: '13px solid transparent',
-              borderRight: '13px solid transparent',
-              borderTop: '22px solid #facc15',
-              zIndex: 30,
+              position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)',
+              width: 0, height: 0,
+              borderLeft: '13px solid transparent', borderRight: '13px solid transparent',
+              borderTop: '22px solid #facc15', zIndex: 30,
               filter: 'drop-shadow(0 0 8px #facc15)'
             }} />
-
-            <div style={{ 
-              width: 300, 
-              height: 300, 
-              borderRadius: '50%',
-              border: '12px solid #39ff14',
-              boxShadow: '0 0 25px #39ff14',
-              overflow: 'hidden',
-              position: 'relative'
+            <div style={{
+              width: 300, height: 300, borderRadius: '50%',
+              border: '12px solid #39ff14', boxShadow: '0 0 25px #39ff14',
+              overflow: 'hidden', position: 'relative'
             }}>
               <img
                 src={WHEEL_IMAGE}
                 alt="Roue"
                 style={{
-                  width: '118%',
-                  height: '118%',
-                  marginLeft: '-9%',
-                  marginTop: '-9%',
+                  width: '118%', height: '118%', marginLeft: '-9%', marginTop: '-9%',
                   borderRadius: '50%',
                   transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.85, 0.25, 1)' : 'none',
                   transform: `rotate(${rotation}deg)`,
-                  objectFit: 'cover',
-                  display: 'block'
+                  objectFit: 'cover', display: 'block'
                 }}
               />
             </div>
@@ -408,15 +490,10 @@ function App() {
             onClick={spinWheel}
             disabled={spinning || !canSpinToday()}
             style={{
-              width: '90%',
-              maxWidth: 320,
+              width: '90%', maxWidth: 320,
               background: (spinning || !canSpinToday()) ? '#333' : '#facc15',
-              color: '#000',
-              border: 'none',
-              padding: '16px 20px',
-              borderRadius: 14,
-              fontWeight: 'bold',
-              fontSize: 18,
+              color: '#000', border: 'none', padding: '16px 20px',
+              borderRadius: 14, fontWeight: 'bold', fontSize: 18,
               opacity: (spinning || !canSpinToday()) ? 0.6 : 1
             }}
           >
@@ -425,14 +502,9 @@ function App() {
 
           {wheelResult && (
             <div style={{
-              marginTop: 22,
-              padding: 16,
-              background: '#0a0a0a',
-              border: '2px solid #22c55e',
-              borderRadius: 12,
-              color: '#22c55e',
-              fontWeight: 'bold',
-              fontSize: 17
+              marginTop: 22, padding: 16, background: '#0a0a0a',
+              border: '2px solid #22c55e', borderRadius: 12,
+              color: '#22c55e', fontWeight: 'bold', fontSize: 17
             }}>
               {wheelResult}
             </div>
@@ -494,56 +566,44 @@ function App() {
         </div>
       )}
 
-      {/* ========== ONGLET ADMIN UNIQUEMENT ========== */}
       {page === 'admin' && isAdmin && (
         <div>
           <h2 style={{ color: '#22c55e', marginBottom: 16 }}>📦 Commandes Admin</h2>
-          
           {adminOrders.length === 0 ? (
             <p style={{ color: '#4ade80', textAlign: 'center' }}>Aucune commande pour le moment</p>
           ) : (
             adminOrders.map((order, index) => (
               <div key={order.id || index} style={{
-                background: '#0a0a0a',
-                border: '1px solid #14532d',
-                borderRadius: 12,
-                padding: 14,
-                marginBottom: 14
+                background: '#0a0a0a', border: '1px solid #14532d',
+                borderRadius: 12, padding: 14, marginBottom: 14
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                   <strong style={{ color: '#22c55e' }}>
                     {order.first_name || 'Client'} (@{order.username || 'N/A'})
                   </strong>
                   <span style={{ 
-                    color: order.status === 'pending' ? '#fbbf24' : '#22c55e',
-                    fontSize: 13,
-                    fontWeight: 'bold'
+                    color: order.status === 'pending' ? '#fbbf24' : order.status === 'validated' ? '#22c55e' : '#ef4444',
+                    fontSize: 13, fontWeight: 'bold'
                   }}>
-                    {order.status === 'pending' ? 'En attente' : order.status}
+                    {order.status === 'pending' ? 'En attente' : order.status === 'validated' ? 'Validée' : order.status}
                   </span>
                 </div>
-
                 <p style={{ color: '#4ade80', fontSize: 13, margin: '4px 0' }}>
                   📅 {new Date(order.created_at).toLocaleString('fr-FR')}
                 </p>
                 <p style={{ color: '#4ade80', fontSize: 13, margin: '4px 0' }}>
                   💰 Total : <strong style={{ color: '#22c55e' }}>{order.total} €</strong>
                 </p>
-
-                {/* Produits commandés */}
                 {order.products?.items && (
                   <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #14532d' }}>
                     <p style={{ color: '#22c55e', fontSize: 13, marginBottom: 6 }}>Produits :</p>
                     {order.products.items.map((item: any, i: number) => (
                       <div key={i} style={{ color: '#4ade80', fontSize: 13, marginLeft: 8 }}>
-                        • {item.name} × {item.quantity} 
-                        {item.price === 0 ? ' (OFFERT)' : ` — ${item.price}€`}
+                        • {item.name} × {item.quantity} {item.price === 0 ? ' (OFFERT)' : ` — ${item.price}€`}
                       </div>
                     ))}
                   </div>
                 )}
-
-                {/* Infos de livraison */}
                 {order.products?.form && (
                   <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #14532d' }}>
                     <p style={{ color: '#22c55e', fontSize: 13, marginBottom: 6 }}>Infos client :</p>
@@ -553,9 +613,20 @@ function App() {
                     {order.products.form.whatClientWants && (
                       <p style={{ color: '#4ade80', fontSize: 13, margin: '2px 0' }}>📝 {order.products.form.whatClientWants}</p>
                     )}
-                    {order.products.form.birthDate && (
-                      <p style={{ color: '#4ade80', fontSize: 13, margin: '2px 0' }}>🎂 {order.products.form.birthDate}</p>
-                    )}
+                  </div>
+                )}
+                {order.status === 'pending' && (
+                  <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                    <button onClick={() => validateOrder(order.id)} style={{
+                      flex: 1, background: '#14532d', color: '#22c55e',
+                      border: '1px solid #22c55e', padding: '10px',
+                      borderRadius: 8, fontWeight: 'bold', fontSize: 14
+                    }}>✅ Valider</button>
+                    <button onClick={() => refuseOrder(order.id)} style={{
+                      flex: 1, background: '#3f0a0a', color: '#ef4444',
+                      border: '1px solid #ef4444', padding: '10px',
+                      borderRadius: 8, fontWeight: 'bold', fontSize: 14
+                    }}>❌ Refuser</button>
                   </div>
                 )}
               </div>
@@ -564,7 +635,7 @@ function App() {
         </div>
       )}
 
-      {page !== 'form' && (
+      {page !== 'form' && page !== 'review' && (
         <div style={bottomNav}>
           <button onClick={() => setPage('catalog')} style={navItem(page === 'catalog')}>🏠<br/>Catalogue</button>
           <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
