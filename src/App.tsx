@@ -129,22 +129,21 @@ function App() {
     return () => clearTimeout(timer)
   }, [])
 
+  // CORRECTION : prend en compte TOUTES les anciennes commandes validées
   const loadUserXp = async (userId: number) => {
-    const { data } = await supabase.from('user_xp').select('xp').eq('user_id', userId).single()
-    if (data) {
-      setXp(data.xp)
-    } else {
-      const { data: validatedOrders } = await supabase
-        .from('orders')
-        .select('total')
-        .eq('user_id', userId)
-        .eq('status', 'validated')
-      if (validatedOrders && validatedOrders.length > 0) {
-        const totalXp = validatedOrders.reduce((sum: number, o: any) => sum + Math.floor(o.total), 0)
-        setXp(totalXp)
-        await supabase.from('user_xp').upsert({ user_id: userId, xp: totalXp })
-      }
+    const { data: validatedOrders } = await supabase
+      .from('orders')
+      .select('total, status')
+      .eq('user_id', userId)
+      .in('status', ['validated', 'shipped', 'delivered', 'reviewed'])
+
+    let totalXp = 0
+    if (validatedOrders && validatedOrders.length > 0) {
+      totalXp = validatedOrders.reduce((sum: number, o: any) => sum + Math.floor(Number(o.total) || 0), 0)
     }
+
+    setXp(totalXp)
+    await supabase.from('user_xp').upsert({ user_id: userId, xp: totalXp })
   }
 
   const loadMyOrders = async (userId: number) => {
@@ -189,13 +188,18 @@ function App() {
     if (!error) {
       setAdminOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'validated' } : o))
       const xpToAdd = Math.floor(orderTotal)
+
       const { data: existing } = await supabase.from('user_xp').select('xp').eq('user_id', orderUserId).single()
       if (existing) {
         await supabase.from('user_xp').update({ xp: existing.xp + xpToAdd }).eq('user_id', orderUserId)
       } else {
         await supabase.from('user_xp').insert({ user_id: orderUserId, xp: xpToAdd })
       }
-      if (user?.id === orderUserId) setXp(prev => prev + xpToAdd)
+
+      if (user?.id === orderUserId) {
+        setXp(prev => prev + xpToAdd)
+      }
+
       alert(`Commande validée ! +${xpToAdd} XP`)
     }
   }
@@ -235,12 +239,10 @@ function App() {
       order_id: reviewOrderId
     })
 
-    // Marque la commande comme "reviewed"
     if (reviewOrderId) {
       await supabase.from('orders').update({ status: 'reviewed' }).eq('id', reviewOrderId)
     }
 
-    // Poste dans le canal
     const stars = '⭐'.repeat(rating)
     const text = `📢 Nouvel avis client !\n\n${stars}\n\n💬 « ${reviewText} »\n\n👤 ${user?.first_name || 'Client'}\n\n@PunzelStoreBot`
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -255,9 +257,20 @@ function App() {
   }
 
   const openClientProfile = async (order: any) => {
-    const { data } = await supabase.from('user_xp').select('xp').eq('user_id', order.user_id).single()
+    // Recalcule aussi l'XP du client à partir de ses commandes
+    const { data: clientOrders } = await supabase
+      .from('orders')
+      .select('total')
+      .eq('user_id', order.user_id)
+      .in('status', ['validated', 'shipped', 'delivered', 'reviewed'])
+
+    let totalXp = 0
+    if (clientOrders && clientOrders.length > 0) {
+      totalXp = clientOrders.reduce((sum: number, o: any) => sum + Math.floor(Number(o.total) || 0), 0)
+    }
+
     setSelectedClient(order)
-    setClientXp(data?.xp || 0)
+    setClientXp(totalXp)
     setPage('clientProfile')
   }
 
@@ -589,7 +602,6 @@ function App() {
             </div>
           </div>
 
-          {/* Suivi des commandes */}
           <h3 style={{ color: '#22c55e', marginTop: 20 }}>📦 Mes commandes</h3>
           {myOrders.length === 0 ? (
             <p style={{ color: '#4ade80' }}>Aucune commande</p>
@@ -634,6 +646,7 @@ function App() {
               <hr style={{ borderColor: '#14532d', margin: '12px 0' }} />
               <p style={{ color: '#4ade80' }}>Rang : <strong style={{ color: '#fbbf24' }}>{getRank(clientXp).name}</strong></p>
               <p style={{ color: '#4ade80' }}>XP : <strong style={{ color: '#22c55e' }}>{clientXp}</strong></p>
+              <p style={{ color: '#4ade80' }}>Réduction : <strong style={{ color: '#fbbf24' }}>{(getRank(clientXp).discount * 100).toFixed(0)}%</strong></p>
             </div>
           </div>
         </div>
@@ -679,95 +692,10 @@ function App() {
                 </div>
               )}
 
-              {/* Boutons selon le statut */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
                 {order.status === 'pending' && (
                   <>
                     <button onClick={() => validateOrder(order.id, order.total, order.user_id)} style={adminBtnGreen}>
                       ✅ Valider (+{Math.floor(order.total)} XP)
                     </button>
-                    <button onClick={() => refuseOrder(order.id)} style={adminBtnRed}>❌ Refuser</button>
-                  </>
-                )}
-                {(order.status === 'validated' || order.status === 'shipped') && (
-                  <>
-                    {order.status === 'validated' && (
-                      <button onClick={() => updateOrderStatus(order.id, 'shipped')} style={adminBtnBlue}>
-                        📦 Colis envoyé
-                      </button>
-                    )}
-                    {order.status === 'shipped' && (
-                      <button onClick={() => updateOrderStatus(order.id, 'delivered')} style={adminBtnPurple}>
-                        🏠 Colis livré
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {page !== 'form' && page !== 'review' && page !== 'clientProfile' && (
-        <div style={bottomNav}>
-          <button onClick={() => setPage('catalog')} style={navItem(page === 'catalog')}>🏠<br/>Catalogue</button>
-          <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
-          <button onClick={() => setPage('wheel')} style={navItem(page === 'wheel')}>🎡<br/>Roue</button>
-          <button onClick={() => setPage('profile')} style={navItem(page === 'profile')}>👤<br/>Profil</button>
-          {isAdmin && (
-            <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Commandes Admin</button>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-const cardStyle: React.CSSProperties = {
-  background: '#0a0a0a', border: '1px solid #14532d', borderRadius: 12,
-  padding: 12, marginBottom: 12, display: 'flex', gap: 12
-}
-const addBtn: React.CSSProperties = {
-  background: '#14532d', color: '#22c55e', border: '1px solid #22c55e',
-  padding: '6px 12px', borderRadius: 6, fontWeight: 'bold'
-}
-const qtyBtn: React.CSSProperties = {
-  background: '#14532d', color: '#22c55e', border: '1px solid #22c55e',
-  width: 28, height: 28, borderRadius: 6
-}
-const orderBtn: React.CSSProperties = {
-  width: '100%', background: '#14532d', color: '#22c55e', border: '1px solid #22c55e',
-  padding: 14, borderRadius: 10, fontWeight: 'bold', marginTop: 12
-}
-const inputStyle: React.CSSProperties = {
-  width: '100%', padding: 12, marginBottom: 10, borderRadius: 8,
-  border: '1px solid #14532d', background: '#0a0a0a', color: '#22c55e', boxSizing: 'border-box'
-}
-const bottomNav: React.CSSProperties = {
-  position: 'fixed', bottom: 0, left: 0, right: 0, background: '#000',
-  borderTop: '1px solid #14532d', display: 'flex', justifyContent: 'space-around',
-  padding: '8px 0', zIndex: 100
-}
-const navItem = (active: boolean): React.CSSProperties => ({
-  background: 'transparent', color: active ? '#22c55e' : '#4ade80',
-  border: 'none', fontSize: 12, fontWeight: active ? 'bold' : 'normal', opacity: active ? 1 : 0.6
-})
-const adminBtnGreen: React.CSSProperties = {
-  flex: 1, background: '#14532d', color: '#22c55e', border: '1px solid #22c55e',
-  padding: '10px', borderRadius: 8, fontWeight: 'bold', fontSize: 13
-}
-const adminBtnRed: React.CSSProperties = {
-  flex: 1, background: '#3f0a0a', color: '#ef4444', border: '1px solid #ef4444',
-  padding: '10px', borderRadius: 8, fontWeight: 'bold', fontSize: 13
-}
-const adminBtnBlue: React.CSSProperties = {
-  flex: 1, background: '#1e3a5f', color: '#3b82f6', border: '1px solid #3b82f6',
-  padding: '10px', borderRadius: 8, fontWeight: 'bold', fontSize: 13
-}
-const adminBtnPurple: React.CSSProperties = {
-  flex: 1, background: '#2e1065', color: '#a855f7', border: '1px solid #a855f7',
-  padding: '10px', borderRadius: 8, fontWeight: 'bold', fontSize: 13
-}
-
-export default App
+                    <button onClick={() => refuseOrder(order.id
