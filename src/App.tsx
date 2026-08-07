@@ -67,6 +67,13 @@ const getRank = (xp: number) => {
   return current
 }
 
+const getNextRank = (xp: number) => {
+  for (const rank of RANKS) {
+    if (xp < rank.xp) return rank
+  }
+  return null
+}
+
 const canSpinToday = () => {
   const last = localStorage.getItem('lastWheelSpin')
   if (!last) return true
@@ -83,7 +90,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [cart, setCart] = useState<CartItem[]>([])
-  const [page, setPage] = useState<'catalog' | 'cart' | 'profile' | 'admin' | 'form' | 'wheel' | 'games' | 'review' | 'clientProfile'>('catalog')
+  const [page, setPage] = useState<'catalog' | 'cart' | 'profile' | 'admin' | 'form' | 'wheel' | 'games' | 'review' | 'clientProfile' | 'xp'>('catalog')
   const [spinning, setSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<string | null>(null)
   const [rotation, setRotation] = useState(0)
@@ -161,10 +168,14 @@ function App() {
 
   useEffect(() => {
     if (page === 'admin') loadAdminOrders()
-    if (page === 'profile' && user?.id) loadMyOrders(user.id)
+    if ((page === 'profile' || page === 'xp') && user?.id) {
+      loadUserXp(user.id)
+      loadMyOrders(user.id)
+    }
   }, [page])
 
   const currentRank = getRank(xp)
+  const nextRank = getNextRank(xp)
   const discount = currentRank.discount
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const totalAfterDiscount = total * (1 - discount)
@@ -172,13 +183,17 @@ function App() {
   const isAdmin = ADMIN_IDS.includes(user?.id)
   const hasProduct = (id: number) => cart.some(i => i.id === id)
 
+  const progressPercent = nextRank
+    ? Math.min(100, ((xp - currentRank.xp) / (nextRank.xp - currentRank.xp)) * 100)
+    : 100
+
+  const xpNeeded = nextRank ? nextRank.xp - xp : 0
+
   const updateOrderStatus = async (orderId: number, status: string) => {
     const { error } = await supabase.from('orders').update({ status }).eq('id', orderId)
     if (!error) {
       setAdminOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
       alert(`Statut mis à jour : ${status}`)
-    } else {
-      alert('Erreur lors de la mise à jour')
     }
   }
 
@@ -447,7 +462,6 @@ function App() {
         </div>
       ))}
 
-      {/* ========== PANIER AVEC BANDEAU RÉDUCTION ========== */}
       {page === 'cart' && (
         <div>
           {cart.length === 0 ? (
@@ -496,9 +510,7 @@ function App() {
                 padding: 16,
                 marginTop: 8
               }}>
-                <p style={{ color: '#4ade80', margin: '0 0 4px 0' }}>
-                  Sous-total : {total.toFixed(2)} €
-                </p>
+                <p style={{ color: '#4ade80', margin: '0 0 4px 0' }}>Sous-total : {total.toFixed(2)} €</p>
                 {discount > 0 && (
                   <p style={{ color: '#fbbf24', margin: '0 0 4px 0' }}>
                     Réduction (−{(discount * 100).toFixed(0)}%) : −{(total * discount).toFixed(2)} €
@@ -532,6 +544,100 @@ function App() {
           )}
           <button onClick={placeOrder} style={orderBtn}>Valider et Payer</button>
           <button onClick={() => setPage('cart')} style={{ ...orderBtn, background: '#333', marginTop: 8 }}>← Retour</button>
+        </div>
+      )}
+
+      {/* ========== ONGLET XP ========== */}
+      {page === 'xp' && (
+        <div>
+          <h2 style={{ color: '#22c55e', textAlign: 'center', marginBottom: 20 }}>⚡ Progression XP</h2>
+
+          <div style={{
+            background: '#0a0a0a',
+            border: '2px solid #22c55e',
+            borderRadius: 16,
+            padding: 20,
+            textAlign: 'center',
+            marginBottom: 20,
+            boxShadow: '0 0 20px rgba(34, 197, 94, 0.3)'
+          }}>
+            <p style={{ color: '#4ade80', margin: 0, fontSize: 14 }}>Rang actuel</p>
+            <p style={{ color: '#fbbf24', fontSize: 28, fontWeight: 'bold', margin: '8px 0' }}>
+              {currentRank.name}
+            </p>
+            <p style={{ color: '#22c55e', fontSize: 36, fontWeight: 'bold', margin: '8px 0' }}>
+              {xp} XP
+            </p>
+            {discount > 0 && (
+              <p style={{ color: '#fbbf24', fontSize: 16, margin: '8px 0 0 0' }}>
+                ✓ Réduction {(discount * 100).toFixed(0)}% active
+              </p>
+            )}
+          </div>
+
+          {nextRank ? (
+            <div style={{
+              background: '#0a0a0a',
+              border: '1px solid #14532d',
+              borderRadius: 12,
+              padding: 16,
+              marginBottom: 20
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ color: '#4ade80', fontSize: 13 }}>{currentRank.name}</span>
+                <span style={{ color: '#4ade80', fontSize: 13 }}>{nextRank.name}</span>
+              </div>
+              <div style={{ background: '#14532d', height: 14, borderRadius: 7, overflow: 'hidden' }}>
+                <div style={{
+                  background: 'linear-gradient(90deg, #22c55e, #4ade80)',
+                  height: '100%',
+                  width: `${progressPercent}%`,
+                  borderRadius: 7,
+                  transition: 'width 0.5s ease'
+                }} />
+              </div>
+              <p style={{ color: '#4ade80', fontSize: 13, textAlign: 'center', marginTop: 10 }}>
+                Encore <strong style={{ color: '#22c55e' }}>{xpNeeded} XP</strong> pour {nextRank.name}
+              </p>
+              <p style={{ color: '#fbbf24', fontSize: 13, textAlign: 'center', margin: '4px 0 0 0' }}>
+                Réduction suivante : {(nextRank.discount * 100).toFixed(0)}%
+              </p>
+            </div>
+          ) : (
+            <div style={{
+              background: '#0a0a0a',
+              border: '2px solid #fbbf24',
+              borderRadius: 12,
+              padding: 16,
+              textAlign: 'center',
+              marginBottom: 20
+            }}>
+              <p style={{ color: '#fbbf24', fontSize: 18, fontWeight: 'bold', margin: 0 }}>
+                👑 Rang maximum atteint !
+              </p>
+            </div>
+          )}
+
+          <h3 style={{ color: '#22c55e', marginBottom: 12 }}>Tous les rangs</h3>
+          {RANKS.map(rank => (
+            <div key={rank.name} style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: xp >= rank.xp ? '#14532d' : '#0a0a0a',
+              border: `1px solid ${xp >= rank.xp ? '#22c55e' : '#14532d'}`,
+              borderRadius: 8,
+              padding: '10px 14px',
+              marginBottom: 6
+            }}>
+              <span style={{ color: xp >= rank.xp ? '#22c55e' : '#4ade80', fontWeight: xp >= rank.xp ? 'bold' : 'normal' }}>
+                {xp >= rank.xp ? '✓ ' : ''}{rank.name}
+              </span>
+              <span style={{ color: '#4ade80', fontSize: 13 }}>
+                {rank.xp} XP • {(rank.discount * 100).toFixed(0)}%
+              </span>
+            </div>
+          ))}
         </div>
       )}
 
@@ -754,9 +860,10 @@ function App() {
           <button onClick={() => setPage('catalog')} style={navItem(page === 'catalog')}>🏠<br/>Catalogue</button>
           <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
           <button onClick={() => setPage('wheel')} style={navItem(page === 'wheel')}>🎡<br/>Roue</button>
+          <button onClick={() => setPage('xp')} style={navItem(page === 'xp')}>⚡<br/>XP</button>
           <button onClick={() => setPage('profile')} style={navItem(page === 'profile')}>👤<br/>Profil</button>
           {isAdmin && (
-            <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Commandes Admin</button>
+            <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Admin</button>
           )}
         </div>
       )}
@@ -791,7 +898,7 @@ const bottomNav: React.CSSProperties = {
 }
 const navItem = (active: boolean): React.CSSProperties => ({
   background: 'transparent', color: active ? '#22c55e' : '#4ade80',
-  border: 'none', fontSize: 12, fontWeight: active ? 'bold' : 'normal', opacity: active ? 1 : 0.6
+  border: 'none', fontSize: 11, fontWeight: active ? 'bold' : 'normal', opacity: active ? 1 : 0.6
 })
 const adminBtnGreen: React.CSSProperties = {
   flex: 1, background: '#14532d', color: '#22c55e', border: '1px solid #22c55e',
