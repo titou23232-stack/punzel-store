@@ -494,19 +494,70 @@ function App() {
         </div>
       )}
 
+      {/* ========== ONGLET ADMIN UNIQUEMENT ========== */}
       {page === 'admin' && isAdmin && (
         <div>
-          <h2 style={{ color: '#22c55e' }}>Commandes clients</h2>
+          <h2 style={{ color: '#22c55e', marginBottom: 16 }}>📦 Commandes Admin</h2>
+          
           {adminOrders.length === 0 ? (
-            <p style={{ color: '#4ade80' }}>Aucune commande</p>
+            <p style={{ color: '#4ade80', textAlign: 'center' }}>Aucune commande pour le moment</p>
           ) : (
-            adminOrders.map(order => (
-              <div key={order.id} style={cardStyle}>
-                <div style={{ width: '100%' }}>
-                  <p style={{ color: '#22c55e', margin: 0 }}><strong>{order.first_name}</strong> (@{order.username || 'N/A'})</p>
-                  <p style={{ color: '#4ade80', fontSize: 13 }}>Total : {order.total} € — {order.status}</p>
-                  <p style={{ color: '#4ade80', fontSize: 12 }}>{new Date(order.created_at).toLocaleString()}</p>
+            adminOrders.map((order, index) => (
+              <div key={order.id || index} style={{
+                background: '#0a0a0a',
+                border: '1px solid #14532d',
+                borderRadius: 12,
+                padding: 14,
+                marginBottom: 14
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <strong style={{ color: '#22c55e' }}>
+                    {order.first_name || 'Client'} (@{order.username || 'N/A'})
+                  </strong>
+                  <span style={{ 
+                    color: order.status === 'pending' ? '#fbbf24' : '#22c55e',
+                    fontSize: 13,
+                    fontWeight: 'bold'
+                  }}>
+                    {order.status === 'pending' ? 'En attente' : order.status}
+                  </span>
                 </div>
+
+                <p style={{ color: '#4ade80', fontSize: 13, margin: '4px 0' }}>
+                  📅 {new Date(order.created_at).toLocaleString('fr-FR')}
+                </p>
+                <p style={{ color: '#4ade80', fontSize: 13, margin: '4px 0' }}>
+                  💰 Total : <strong style={{ color: '#22c55e' }}>{order.total} €</strong>
+                </p>
+
+                {/* Produits commandés */}
+                {order.products?.items && (
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #14532d' }}>
+                    <p style={{ color: '#22c55e', fontSize: 13, marginBottom: 6 }}>Produits :</p>
+                    {order.products.items.map((item: any, i: number) => (
+                      <div key={i} style={{ color: '#4ade80', fontSize: 13, marginLeft: 8 }}>
+                        • {item.name} × {item.quantity} 
+                        {item.price === 0 ? ' (OFFERT)' : ` — ${item.price}€`}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Infos de livraison */}
+                {order.products?.form && (
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #14532d' }}>
+                    <p style={{ color: '#22c55e', fontSize: 13, marginBottom: 6 }}>Infos client :</p>
+                    <p style={{ color: '#4ade80', fontSize: 13, margin: '2px 0' }}>👤 {order.products.form.fullName}</p>
+                    <p style={{ color: '#4ade80', fontSize: 13, margin: '2px 0' }}>📍 {order.products.form.address}</p>
+                    <p style={{ color: '#4ade80', fontSize: 13, margin: '2px 0' }}>📞 {order.products.form.phone}</p>
+                    {order.products.form.whatClientWants && (
+                      <p style={{ color: '#4ade80', fontSize: 13, margin: '2px 0' }}>📝 {order.products.form.whatClientWants}</p>
+                    )}
+                    {order.products.form.birthDate && (
+                      <p style={{ color: '#4ade80', fontSize: 13, margin: '2px 0' }}>🎂 {order.products.form.birthDate}</p>
+                    )}
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -519,7 +570,11 @@ function App() {
           <button onClick={() => setPage('cart')} style={navItem(page === 'cart')}>🛒<br/>Panier ({cartCount})</button>
           <button onClick={() => setPage('wheel')} style={navItem(page === 'wheel')}>🎡<br/>Roue</button>
           <button onClick={() => setPage('profile')} style={navItem(page === 'profile')}>👤<br/>Profil</button>
-          {isAdmin && <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>🛡️<br/>Admin</button>}
+          {isAdmin && (
+            <button onClick={() => setPage('admin')} style={navItem(page === 'admin')}>
+              🛡️<br/>Commandes Admin
+            </button>
+          )}
         </div>
       )}
     </div>
