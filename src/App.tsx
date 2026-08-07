@@ -129,7 +129,6 @@ function App() {
     return () => clearTimeout(timer)
   }, [])
 
-  // CORRECTION : prend en compte TOUTES les anciennes commandes validées
   const loadUserXp = async (userId: number) => {
     const { data: validatedOrders } = await supabase
       .from('orders')
@@ -188,18 +187,13 @@ function App() {
     if (!error) {
       setAdminOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'validated' } : o))
       const xpToAdd = Math.floor(orderTotal)
-
       const { data: existing } = await supabase.from('user_xp').select('xp').eq('user_id', orderUserId).single()
       if (existing) {
         await supabase.from('user_xp').update({ xp: existing.xp + xpToAdd }).eq('user_id', orderUserId)
       } else {
         await supabase.from('user_xp').insert({ user_id: orderUserId, xp: xpToAdd })
       }
-
-      if (user?.id === orderUserId) {
-        setXp(prev => prev + xpToAdd)
-      }
-
+      if (user?.id === orderUserId) setXp(prev => prev + xpToAdd)
       alert(`Commande validée ! +${xpToAdd} XP`)
     }
   }
@@ -257,7 +251,6 @@ function App() {
   }
 
   const openClientProfile = async (order: any) => {
-    // Recalcule aussi l'XP du client à partir de ses commandes
     const { data: clientOrders } = await supabase
       .from('orders')
       .select('total')
@@ -454,10 +447,32 @@ function App() {
         </div>
       ))}
 
+      {/* ========== PANIER AVEC BANDEAU RÉDUCTION ========== */}
       {page === 'cart' && (
         <div>
-          {cart.length === 0 ? <p style={{ textAlign: 'center', color: '#4ade80' }}>Panier vide</p> : (
+          {cart.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#4ade80' }}>Panier vide</p>
+          ) : (
             <>
+              {discount > 0 && (
+                <div style={{
+                  background: 'linear-gradient(90deg, #14532d, #166534)',
+                  border: '2px solid #22c55e',
+                  borderRadius: 12,
+                  padding: '14px 16px',
+                  marginBottom: 16,
+                  textAlign: 'center',
+                  boxShadow: '0 0 15px rgba(34, 197, 94, 0.4)'
+                }}>
+                  <p style={{ margin: 0, color: '#fbbf24', fontWeight: 'bold', fontSize: 16 }}>
+                    🎉 Réduction {currentRank.name} active
+                  </p>
+                  <p style={{ margin: '6px 0 0 0', color: '#22c55e', fontSize: 22, fontWeight: 'bold' }}>
+                    −{(discount * 100).toFixed(0)}% sur ta commande
+                  </p>
+                </div>
+              )}
+
               {cart.map(item => (
                 <div key={item.id + '-' + item.price} style={{ ...cardStyle, justifyContent: 'space-between' }}>
                   <div>
@@ -473,10 +488,27 @@ function App() {
                   </div>
                 </div>
               ))}
-              <h3 style={{ color: '#22c55e' }}>
-                Total : {total.toFixed(2)} €
-                {discount > 0 && <span style={{ color: '#fbbf24' }}> (−{(discount * 100).toFixed(0)}% = {totalAfterDiscount.toFixed(2)} €)</span>}
-              </h3>
+
+              <div style={{
+                background: '#0a0a0a',
+                border: '1px solid #14532d',
+                borderRadius: 12,
+                padding: 16,
+                marginTop: 8
+              }}>
+                <p style={{ color: '#4ade80', margin: '0 0 4px 0' }}>
+                  Sous-total : {total.toFixed(2)} €
+                </p>
+                {discount > 0 && (
+                  <p style={{ color: '#fbbf24', margin: '0 0 4px 0' }}>
+                    Réduction (−{(discount * 100).toFixed(0)}%) : −{(total * discount).toFixed(2)} €
+                  </p>
+                )}
+                <h3 style={{ color: '#22c55e', margin: '8px 0 0 0' }}>
+                  Total à payer : {totalAfterDiscount.toFixed(2)} €
+                </h3>
+              </div>
+
               <button onClick={() => setPage('form')} style={orderBtn}>Continuer →</button>
             </>
           )}
