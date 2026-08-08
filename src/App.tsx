@@ -85,21 +85,21 @@ const PRODUCTS: Product[] = [
     id: 1,
     name: 'Xanax',
     price: 15,
-    image: 'https://www.google.com/imgres?q=alprazolam&imgurl=https%3A%2F%2Fmboapharma.cm%2Fwp-content%2Fuploads%2F2025%2F03%2Falprazolam-biogaran-0-50-mg-comprime-secable.webp&imgrefurl=https%3A%2F%2Fmboapharma.cm%2Fproduit%2Falprazolam-biogaran-050-mg%2F&docid=9s5gfhRDgPwDDM&tbnid=5vAVFXVSOqq9HM&vet=12ahUKEwierL6o9JCWAxXgU6QEHdkKJtwQnPAOegUIhwEQAA..i&w=300&h=300&hcb=2&ved=2ahUKEwierL6o9JCWAxXgU6QEHdkKJtwQnPAOegUIhwEQAA',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlhoDUeOZOn1JJKEnNlTCtf5v-szjMc041YkvJeVjnNQ&s=10',
     description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente..'
   },
   {
     id: 2,
     name: 'Ordonnance',
     price: 35,
-    image: 'https://www.google.com/imgres?q=ordonnance&imgurl=https%3A%2F%2Fwww.ordre.pharmacien.fr%2Fvar%2Fsite%2Fstorage%2Fimages%2F0%2F6%2F5%2F0%2F850560-2-fre-FR%2F2796ec0b4fe8-CNOP_26_QR_Ordonnance.png&imgrefurl=https%3A%2F%2Fwww.ordre.pharmacien.fr%2Fles-communications%2Ffocus-sur%2Fla-revue%2Ftous-pharmaciens-la-revue-n-26-novembre-2024%2Fquand-et-comment-s-impose-l-ordonnance-numerique&docid=zRtKUh_kK4ayKM&tbnid=mEXnIdOhmXw0uM&vet=12ahUKEwjw2fzM9JCWAxVGRKQEHS66ALcQnPAOegUIiwEQAA..i&w=346&h=346&hcb=2&ved=2ahUKEwjw2fzM9JCWAxVGRKQEHS66ALcQnPAOegUIiwEQAA',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10',
     description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation..'
   },
   {
     id: 3,
     name: 'Dextrometrophane',
     price: 20,
-    image: 'https://www.google.com/imgres?q=dextrometrophane&imgurl=https%3A%2F%2Fcdn.pim.mesoigner.fr%2Fmesoigner%2Fd8a30df0dd02958e70f279d4d06be75a%2Fmesoigner-thumbnail-1000-1000-inset%2F086%2F984%2F100%2Fdextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp&imgrefurl=https%3A%2F%2Fpharmacie-gascogne-seysses.mesoigner.fr%2Fmedicament-produit-parapharmacie%2F346663-dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique&docid=hDCQ1pKpjkMJDM&tbnid=n-HjYwhJwPy1NM&vet=12ahUKEwitweXs9JCWAxU6V6QEHSolLvUQnPAOegQINxAA..i&w=1000&h=1000&hcb=2&ved=2ahUKEwitweXs9JCWAxU6V6QEHSolLvUQnPAOegQINxAA',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgEk4pnpfjIUxFjbc1kYViNFO4ngSgGhNmKcp1vgjLRQ&s=10',
     description: 'Le dextrométhorphane peut provoquer des sensations de vertige ou de tête qui tourne..'
   }
 ]
