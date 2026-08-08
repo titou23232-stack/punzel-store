@@ -81,9 +81,27 @@ const canSpinToday = () => {
 }
 
 const PRODUCTS: Product[] = [
-  { id: 1, name: 'Xanax 0,50mg', price: 15, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJhx-xztg-n9PMr7wLxunTzbf3SDJe1hSxpkzr9cPB-w&s=10', description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété.' },
-  { id: 2, name: 'Ordonnance', price: 35, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUnRhKHeeNKrKDzTbOcpiDd9eo7JNdnsyEdNyC8ftKA&s=10', description: 'Une ordonnance médicale.' },
-  { id: 3, name: 'Dextrometrophane', price: 20, image: 'https://cdn.pim.mesoigner.fr/mesoigner/d8a30df0dd02958e70f279d4d06be75a/mesoigner-thumbnail-1000-1000-inset/086/984/100/dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp', description: 'Le dextrométhorphane.' }
+  {
+    id: 1,
+    name: 'Xanax',
+    price: 15,
+    image: 'https://www.google.com/imgres?q=alprazolam&imgurl=https%3A%2F%2Fmboapharma.cm%2Fwp-content%2Fuploads%2F2025%2F03%2Falprazolam-biogaran-0-50-mg-comprime-secable.webp&imgrefurl=https%3A%2F%2Fmboapharma.cm%2Fproduit%2Falprazolam-biogaran-050-mg%2F&docid=9s5gfhRDgPwDDM&tbnid=5vAVFXVSOqq9HM&vet=12ahUKEwierL6o9JCWAxXgU6QEHdkKJtwQnPAOegUIhwEQAA..i&w=300&h=300&hcb=2&ved=2ahUKEwierL6o9JCWAxXgU6QEHdkKJtwQnPAOegUIhwEQAA',
+    description: 'L’alprazolam est un médicament utilisé pour réduire les sensations d’anxiété. Il aide à favoriser un état de calme et de détente..'
+  },
+  {
+    id: 2,
+    name: 'Ordonnance',
+    price: 35,
+    image: 'https://www.google.com/imgres?q=ordonnance&imgurl=https%3A%2F%2Fwww.ordre.pharmacien.fr%2Fvar%2Fsite%2Fstorage%2Fimages%2F0%2F6%2F5%2F0%2F850560-2-fre-FR%2F2796ec0b4fe8-CNOP_26_QR_Ordonnance.png&imgrefurl=https%3A%2F%2Fwww.ordre.pharmacien.fr%2Fles-communications%2Ffocus-sur%2Fla-revue%2Ftous-pharmaciens-la-revue-n-26-novembre-2024%2Fquand-et-comment-s-impose-l-ordonnance-numerique&docid=zRtKUh_kK4ayKM&tbnid=mEXnIdOhmXw0uM&vet=12ahUKEwjw2fzM9JCWAxVGRKQEHS66ALcQnPAOegUIiwEQAA..i&w=346&h=346&hcb=2&ved=2ahUKEwjw2fzM9JCWAxVGRKQEHS66ALcQnPAOegUIiwEQAA',
+    description: 'Une ordonnance médicale est un document qui indique un traitement à suivre, avec les informations nécessaires à son utilisation..'
+  },
+  {
+    id: 3,
+    name: 'Dextrometrophane',
+    price: 20,
+    image: 'https://www.google.com/imgres?q=dextrometrophane&imgurl=https%3A%2F%2Fcdn.pim.mesoigner.fr%2Fmesoigner%2Fd8a30df0dd02958e70f279d4d06be75a%2Fmesoigner-thumbnail-1000-1000-inset%2F086%2F984%2F100%2Fdextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique.webp&imgrefurl=https%3A%2F%2Fpharmacie-gascogne-seysses.mesoigner.fr%2Fmedicament-produit-parapharmacie%2F346663-dextromethorphane-biogaran-1-5-mg-ml-sans-sucre-solution-buvable-edulcoree-au-maltitol-liquide-et-a-la-saccharine-sodique&docid=hDCQ1pKpjkMJDM&tbnid=n-HjYwhJwPy1NM&vet=12ahUKEwitweXs9JCWAxU6V6QEHSolLvUQnPAOegQINxAA..i&w=1000&h=1000&hcb=2&ved=2ahUKEwitweXs9JCWAxU6V6QEHSolLvUQnPAOegQINxAA',
+    description: 'Le dextrométhorphane peut provoquer des sensations de vertige ou de tête qui tourne..'
+  }
 ]
 
 function App() {
@@ -111,9 +129,7 @@ function App() {
     quantity: '',
     fullName: '',
     address: '',
-    phone: '',
-    whatClientWants: '',
-    birthDate: ''
+    phone: ''
   })
 
   useEffect(() => {
@@ -186,7 +202,6 @@ function App() {
   const progressPercent = nextRank
     ? Math.min(100, ((xp - currentRank.xp) / (nextRank.xp - currentRank.xp)) * 100)
     : 100
-
   const xpNeeded = nextRank ? nextRank.xp - xp : 0
 
   const updateOrderStatus = async (orderId: number, status: string) => {
@@ -330,15 +345,7 @@ function App() {
         if (user?.id) await supabase.from('user_xp').upsert({ user_id: user.id, xp: newXp })
         resultText = `🎉 +${selected.value} XP !`
       } else if (selected.type === 'xanax') {
-        const xanax = PRODUCTS.find(p => p.id === 1)
-        if (xanax) {
-          setCart(prev => {
-            const existing = prev.find(i => i.id === 1 && i.price === 0)
-            if (existing) return prev.map(i => (i.id === 1 && i.price === 0) ? { ...i, quantity: i.quantity + 1 } : i)
-            return [...prev, { ...xanax, price: 0, name: 'Boîte Xanax (OFFERTE)', quantity: 1 }]
-          })
-        }
-        resultText = '💊 JACKPOT ! Boîte de Xanax offerte !'
+        resultText = '🎁 JACKPOT ! Prix spécial !'
       } else {
         resultText = '😢 Perdu...'
       }
@@ -365,10 +372,6 @@ function App() {
   const placeOrder = async () => {
     if (!user || !form.fullName || !form.address || !form.phone) {
       alert('Remplis tous les champs obligatoires')
-      return
-    }
-    if (hasProduct(2) && (!form.whatClientWants || !form.birthDate)) {
-      alert('Pour le Produit 2, remplis aussi "Ce que tu veux" et la date de naissance')
       return
     }
 
@@ -403,16 +406,17 @@ function App() {
     localStorage.setItem('orders', String(orders + 1))
 
     const tg = (window as any).Telegram?.WebApp
+    // Produit 2 → Stripe | Autres → Vinted
     if (hasProduct(2)) {
-      if (tg) tg.openLink(PAYPAL_URL)
-      else window.open(PAYPAL_URL, '_blank')
+      if (tg) tg.openLink(STRIPE_URL)
+      else window.open(STRIPE_URL, '_blank')
     } else {
       if (tg) tg.openLink(VINTED_URL)
       else window.open(VINTED_URL, '_blank')
     }
 
     setCart([])
-    setForm({ quantity: '', fullName: '', address: '', phone: '', whatClientWants: '', birthDate: '' })
+    setForm({ quantity: '', fullName: '', address: '', phone: '' })
     setPage('catalog')
     alert('Commande enregistrée !')
   }
@@ -450,7 +454,7 @@ function App() {
 
       {page === 'catalog' && PRODUCTS.map(p => (
         <div key={p.id} style={cardStyle}>
-          <img src={p.image} style={{ width: 80, height: 80, borderRadius: 8 }} />
+          <img src={p.image} style={{ width: 80, height: 80, borderRadius: 8, objectFit: 'cover' }} />
           <div style={{ flex: 1 }}>
             <h3 style={{ margin: 0, color: '#22c55e' }}>{p.name}</h3>
             <p style={{ fontSize: 13, color: '#4ade80', opacity: 0.8 }}>{p.description}</p>
@@ -491,8 +495,8 @@ function App() {
                 <div key={item.id + '-' + item.price} style={{ ...cardStyle, justifyContent: 'space-between' }}>
                   <div>
                     <strong style={{ color: '#22c55e' }}>{item.name}</strong>
-                    <div style={{ fontSize: 13, color: item.price === 0 ? '#fbbf24' : '#4ade80' }}>
-                      {item.price === 0 ? 'OFFERT' : `${item.price} €`} × {item.quantity}
+                    <div style={{ fontSize: 13, color: '#4ade80' }}>
+                      {item.price} € × {item.quantity}
                     </div>
                   </div>
                   <div>
@@ -533,21 +537,12 @@ function App() {
           <input placeholder="Nom et Prénom *" value={form.fullName} onChange={e => setForm({ ...form, fullName: e.target.value })} style={inputStyle} />
           <input placeholder="Adresse *" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={inputStyle} />
           <input placeholder="Numéro de téléphone *" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={inputStyle} />
-          {(hasProduct(1) || hasProduct(3)) && (
-            <input placeholder="Quantité" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} style={inputStyle} />
-          )}
-          {hasProduct(2) && (
-            <>
-              <input placeholder="Ce que tu veux (Produit 2)" value={form.whatClientWants} onChange={e => setForm({ ...form, whatClientWants: e.target.value })} style={inputStyle} />
-              <input type="date" value={form.birthDate} onChange={e => setForm({ ...form, birthDate: e.target.value })} style={inputStyle} />
-            </>
-          )}
+          <input placeholder="Quantité" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} style={inputStyle} />
           <button onClick={placeOrder} style={orderBtn}>Valider et Payer</button>
           <button onClick={() => setPage('cart')} style={{ ...orderBtn, background: '#333', marginTop: 8 }}>← Retour</button>
         </div>
       )}
 
-      {/* ========== ONGLET XP ========== */}
       {page === 'xp' && (
         <div>
           <h2 style={{ color: '#22c55e', textAlign: 'center', marginBottom: 20 }}>⚡ Progression XP</h2>
@@ -562,12 +557,8 @@ function App() {
             boxShadow: '0 0 20px rgba(34, 197, 94, 0.3)'
           }}>
             <p style={{ color: '#4ade80', margin: 0, fontSize: 14 }}>Rang actuel</p>
-            <p style={{ color: '#fbbf24', fontSize: 28, fontWeight: 'bold', margin: '8px 0' }}>
-              {currentRank.name}
-            </p>
-            <p style={{ color: '#22c55e', fontSize: 36, fontWeight: 'bold', margin: '8px 0' }}>
-              {xp} XP
-            </p>
+            <p style={{ color: '#fbbf24', fontSize: 28, fontWeight: 'bold', margin: '8px 0' }}>{currentRank.name}</p>
+            <p style={{ color: '#22c55e', fontSize: 36, fontWeight: 'bold', margin: '8px 0' }}>{xp} XP</p>
             {discount > 0 && (
               <p style={{ color: '#fbbf24', fontSize: 16, margin: '8px 0 0 0' }}>
                 ✓ Réduction {(discount * 100).toFixed(0)}% active
@@ -612,9 +603,7 @@ function App() {
               textAlign: 'center',
               marginBottom: 20
             }}>
-              <p style={{ color: '#fbbf24', fontSize: 18, fontWeight: 'bold', margin: 0 }}>
-                👑 Rang maximum atteint !
-              </p>
+              <p style={{ color: '#fbbf24', fontSize: 18, fontWeight: 'bold', margin: 0 }}>👑 Rang maximum atteint !</p>
             </div>
           )}
 
