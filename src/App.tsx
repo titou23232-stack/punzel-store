@@ -10,7 +10,7 @@ const CHANNEL_ID = '-1004398747516'
 
 const ADMIN_IDS = [5553381196, 6044402765]
 const VINTED_URL = 'https://www.vinted.fr/member/3164609498-punslestore5'
-const PAYPAL_URL = 'https://paypal.me/PunzelStore'
+const STRIPE_URL = 'https://buy.stripe.com/5kQcN61ei01D9bH5cP1gs00'
 const WHEEL_IMAGE = 'https://i.imgur.com/3xFzdoI.jpeg'
 
 type Product = {
